@@ -105,9 +105,10 @@ public class Example {
         if (r != null) {
             System.out.printf("Result id: %s\n", r.commandId);
             for (Map.Entry<String, String> param : r.params.entrySet())
-                System.out.printf("  %s=%s", param.getKey(), param.getValue());
+                System.out.printf("  %s=%s\n", param.getKey(), param.getValue());
         }
-        System.out.printf(" duration: %.3fs", t / 1000.);
+        System.out.printf(" duration: %.3fs\n", t / 1000.);
+        System.out.printf("==================================================\n");
     }
 
     public static void main(String[] args) {
