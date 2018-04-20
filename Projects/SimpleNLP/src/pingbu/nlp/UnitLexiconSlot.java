@@ -2,21 +2,17 @@ package pingbu.nlp;
 
 public class UnitLexiconSlot implements Unit {
 
-    protected Lexicon mLexicon;
-    private String mId;
+    protected final Lexicon mLexicon;
+    private final String mId;
 
     public UnitLexiconSlot(Lexicon lexicon) {
         mLexicon = lexicon;
-        mId = String.format("<%d>", lexicon.getId());
-    }
-
-    public short getLexiconId() {
-        return mLexicon.getId();
+        mId = String.format("<%s>", lexicon.id);
     }
 
     @Override
     public String toString() {
-        return String.format("<%s>", mLexicon.getDebugName());
+        return mId;
     }
 
     @Override

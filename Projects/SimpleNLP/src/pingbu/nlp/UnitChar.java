@@ -4,7 +4,7 @@ import pingbu.common.Pinyin;
 
 class UnitChar implements Unit {
 
-    protected char mChar;
+    protected final char mChar;
 
     public UnitChar(char c) {
         mChar = c;

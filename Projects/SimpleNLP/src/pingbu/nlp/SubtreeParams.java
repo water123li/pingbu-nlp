@@ -1,15 +1,19 @@
 package pingbu.nlp;
 
+import java.util.Collection;
+
 /**
- * 可选语法子树
+ * 参数语法子树，对下级子树产生参数表达式信息
  * 
  * @author pingbu
  */
-class SubtreeOptional extends Subtree {
+class SubtreeParams extends Subtree {
 
-    private Subtree mSubtree;
+    private final Collection<Grammar.ItemParam> mParams;
+    private final Subtree mSubtree;
 
-    public SubtreeOptional(Subtree subtree) {
+    public SubtreeParams(Collection<Grammar.ItemParam> params, Subtree subtree) {
+        mParams = params;
         mSubtree = subtree;
     }
 
@@ -21,8 +25,9 @@ class SubtreeOptional extends Subtree {
 
         @Override
         public void navigate(Navigator navigator) {
+            navigator.pushParams(mParams);
             mSubtree.newCursor(mReturnCursor).navigate(navigator);
-            navigateReturn(navigator);
+            navigator.popParams(mParams);
         }
     }
 

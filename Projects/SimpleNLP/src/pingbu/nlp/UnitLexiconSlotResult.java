@@ -1,6 +1,7 @@
 package pingbu.nlp;
 
-public class UnitLexiconSlotResult extends UnitLexiconSlot implements Unit.Result {
+public class UnitLexiconSlotResult extends UnitLexiconSlot implements
+        Unit.Result {
 
     private Lexicon.SearchResult mResult;
 
@@ -21,12 +22,12 @@ public class UnitLexiconSlotResult extends UnitLexiconSlot implements Unit.Resul
 
     @Override
     public String getText() {
-        return mLexicon.getItem(mResult.item);
+        return mLexicon.getItemText(mResult.item);
     }
 
     @Override
     public int getLength() {
-        return mLexicon.getItem(mResult.item).length();
+        return mLexicon.getItemText(mResult.item).length();
     }
 
     @Override
@@ -36,8 +37,9 @@ public class UnitLexiconSlotResult extends UnitLexiconSlot implements Unit.Resul
 
     @Override
     public double compare(Unit unit) {
-        if (unit instanceof UnitLexiconSlot && ((UnitLexiconSlot) unit).mLexicon.equals(mLexicon))
-            return mResult.priority;
+        if (unit instanceof UnitLexiconSlot
+                && ((UnitLexiconSlot) unit).mLexicon.equals(mLexicon))
+            return mResult.score;
         else
             return 0;
     }

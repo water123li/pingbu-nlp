@@ -3,6 +3,11 @@ package pingbu.nlp;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 线性语法子树
+ * 
+ * @author pingbu
+ */
 class SubtreeLinear extends Subtree {
 
     private List<Subtree> mSubtrees = new ArrayList<Subtree>();
@@ -19,17 +24,17 @@ class SubtreeLinear extends Subtree {
         }
 
         public Subtree.Cursor next() {
-            Cursor cursor = new Cursor(returnCursor);
+            Cursor cursor = new Cursor(mReturnCursor);
             cursor.mPosition = mPosition + 1;
             return cursor;
         }
 
         @Override
-        public void travel(TravelInfo info) {
+        public void navigate(Navigator navigator) {
             if (mPosition < mSubtrees.size())
-                mSubtrees.get(mPosition).newCursor(next()).travel(info);
+                mSubtrees.get(mPosition).newCursor(next()).navigate(navigator);
             else
-                returnCursor.travel(info);
+                navigateReturn(navigator);
         }
     }
 

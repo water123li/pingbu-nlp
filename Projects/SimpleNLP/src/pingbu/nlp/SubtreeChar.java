@@ -1,11 +1,16 @@
 package pingbu.nlp;
 
+/**
+ * 字符槽子树
+ * 
+ * @author pingbu
+ */
 class SubtreeChar extends Subtree {
 
-    private char mChar;
+    private UnitChar mUnit;
 
     public SubtreeChar(char c) {
-        mChar = c;
+        mUnit = new UnitChar(c);
     }
 
     private class Cursor extends Subtree.Cursor {
@@ -14,10 +19,11 @@ class SubtreeChar extends Subtree {
         }
 
         @Override
-        public void travel(TravelInfo info) {
-            info.path.add(new UnitChar(mChar));
-            returnCursor.travel(info);
-            info.path.remove(info.path.size() - 1);
+        public void navigate(Navigator navigator) {
+            if (navigator.pushUnit(mUnit)) {
+                navigateReturn(navigator);
+                navigator.popUnit();
+            }
         }
     }
 

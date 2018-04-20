@@ -1,5 +1,10 @@
 package pingbu.nlp;
 
+/**
+ * 空子树，用于解析到语法描述错误时为语法树提供容错
+ * 
+ * @author pingbu
+ */
 class SubtreeEmpty extends Subtree {
 
     private static class Cursor extends Subtree.Cursor {
@@ -8,8 +13,8 @@ class SubtreeEmpty extends Subtree {
         }
 
         @Override
-        public void travel(TravelInfo info) {
-            returnCursor.travel(info);
+        public void navigate(Navigator navigator) {
+            navigateReturn(navigator);
         }
     }
 

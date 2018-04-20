@@ -3,6 +3,11 @@ package pingbu.nlp;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * 或语法子树
+ * 
+ * @author pingbu
+ */
 class SubtreeOr extends Subtree {
     private List<Subtree> mSubtrees = new LinkedList<Subtree>();
 
@@ -21,12 +26,12 @@ class SubtreeOr extends Subtree {
         }
 
         @Override
-        public void travel(TravelInfo info) {
+        public void navigate(Navigator navigator) {
             if (mSubtrees.size() == 0)
-                returnCursor.travel(info);
+                navigateReturn(navigator);
             else
                 for (Subtree grammar : mSubtrees)
-                    grammar.newCursor(returnCursor).travel(info);
+                    grammar.newCursor(mReturnCursor).navigate(navigator);
         }
     }
 

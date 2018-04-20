@@ -1,11 +1,23 @@
 package pingbu.nlp;
 
+import java.util.Collection;
+
+/**
+ * 词典槽子树，引用词典并应用默认槽和参数信息
+ * 
+ * @author pingbu
+ */
 class SubtreeLexiconSlot extends Subtree {
 
-    private Lexicon mLexicon;
+    private final Lexicon mLexicon;
+    private final UnitLexiconSlot mUnit;
+    private final Collection<Grammar.ItemParam> mParams;
 
-    public SubtreeLexiconSlot(Lexicon lexicon) {
+    public SubtreeLexiconSlot(Lexicon lexicon,
+            Collection<Grammar.ItemParam> params) {
         mLexicon = lexicon;
+        mUnit = new UnitLexiconSlot(lexicon);
+        mParams = params;
     }
 
     private class Cursor extends Subtree.Cursor {
@@ -14,20 +26,25 @@ class SubtreeLexiconSlot extends Subtree {
         }
 
         @Override
-        public void travel(TravelInfo info) {
-            if (info.commandId != null) {
-                info.path.add(new UnitLexiconSlot(mLexicon));
-                returnCursor.travel(info);
-                info.path.remove(info.path.size() - 1);
-            } else
+        public void navigate(Navigator navigator) {
+            if (navigator.extendLexicon()) {
                 for (int i = 0; i < mLexicon.getItemCount(); ++i) {
-                    String s = mLexicon.getItem(i);
+                    String s = mLexicon.getItemText(i);
                     for (int j = 0; j < s.length(); ++j)
-                        info.path.add(new UnitChar(s.charAt(j)));
-                    returnCursor.travel(info);
+                        if (!navigator.pushUnit(new UnitChar(s.charAt(j))))
+                            throw new RuntimeException();
+                    navigator.pushParams(mParams);
+                    navigateReturn(navigator);
+                    navigator.popParams(mParams);
                     for (int j = 0; j < s.length(); ++j)
-                        info.path.remove(info.path.size() - 1);
+                        navigator.popUnit();
                 }
+            } else if (navigator.pushUnit(mUnit)) {
+                navigator.pushParams(mParams);
+                navigateReturn(navigator);
+                navigator.popParams(mParams);
+                navigator.popUnit();
+            }
         }
     }
 

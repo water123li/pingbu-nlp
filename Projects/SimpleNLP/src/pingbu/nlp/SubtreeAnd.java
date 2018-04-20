@@ -3,6 +3,11 @@ package pingbu.nlp;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * 和语法子树
+ * 
+ * @author pingbu
+ */
 class SubtreeAnd extends Subtree {
     private List<Subtree> mSubtrees = new LinkedList<Subtree>();
 
@@ -21,18 +26,19 @@ class SubtreeAnd extends Subtree {
         }
 
         @Override
-        public void travel(TravelInfo info) {
+        public void navigate(Navigator navigator) {
             if (mSubtrees.size() == 0)
-                returnCursor.travel(info);
+                navigateReturn(navigator);
             else if (mSubtrees.size() == 1)
-                mSubtrees.get(0).newCursor(returnCursor).travel(info);
+                mSubtrees.get(0).newCursor(mReturnCursor).navigate(navigator);
             else
                 for (int i = 0; i < mSubtrees.size(); ++i) {
                     SubtreeAnd g = new SubtreeAnd();
                     for (int j = 0; j < mSubtrees.size(); ++j)
                         if (j != i)
                             g.addSubtree(mSubtrees.get(j));
-                    mSubtrees.get(i).newCursor(g.newCursor(returnCursor)).travel(info);
+                    mSubtrees.get(i).newCursor(g.newCursor(mReturnCursor))
+                            .navigate(navigator);
                 }
         }
     }
