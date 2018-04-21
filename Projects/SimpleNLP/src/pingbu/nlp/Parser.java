@@ -254,54 +254,31 @@ public final class Parser {
         }
     }
 
-    public final LexiconSimple compileLexicon() {
-        return compileLexicon(1);
+    public final LexiconSimple compileLexicon(String name, int type) {
+        return __compileLexicon(name, type, mCommands);
     }
 
-    public final LexiconSimple compileLexicon(int type) {
-        return compileLexiconWithDebugName(null, type);
-    }
-
-    public final LexiconSimple compileLexiconWithDebugName(String debugName) {
-        return compileLexiconWithDebugName(debugName, 1);
-    }
-
-    public final LexiconSimple compileLexiconWithDebugName(String debugName,
-            int type) {
-        return __compileLexicon(debugName, type, mCommands);
-    }
-
-    private final LexiconSimple __compileLexicon(String debugName, int type,
+    private final LexiconSimple __compileLexicon(String name, int type,
             Subtree grammar) {
-        log("==> compileLexiconWithDebugName %s", debugName);
+        log("==> compileLexicon %s", name);
         long t = System.currentTimeMillis();
-        LexiconSimple lexicon = type == 2 ? new LexiconSimple2(debugName)
-                : new LexiconSimple1(debugName);
+        LexiconSimple lexicon = type == 2 ? new LexiconSimple2(name)
+                : new LexiconSimple1(name, type == Lexicon.TYPE_FUZZY);
         grammar.newCursor(null).navigate(new LexiconNavigator(lexicon));
         t = System.currentTimeMillis() - t;
-        log("<== compileLexiconWithDebugName %.3fs", t / 1000.);
+        log("<== compileLexicon %.3fs", t / 1000.);
         return lexicon;
     }
 
-    public static final LexiconSimple compileLexicon(String desc) {
-        return compileLexicon(desc, 1);
+    public static final LexiconSimple compileLexicon(String name, String desc) {
+        return compileLexicon(name, desc, 1);
     }
 
-    public static final LexiconSimple compileLexicon(String desc, int type) {
-        log("compileLexicon <-- %s", desc);
-        return compileLexiconWithDebugName(null, desc, type);
-    }
-
-    public static final LexiconSimple compileLexiconWithDebugName(
-            String debugName, String desc) {
-        return compileLexiconWithDebugName(debugName, desc, 1);
-    }
-
-    public static final LexiconSimple compileLexiconWithDebugName(
-            String debugName, String desc, int type) {
+    public static final LexiconSimple compileLexicon(String name, String desc,
+            int type) {
         Parser parser = new Parser();
         parser.addCommand(desc, null);
-        return parser.compileLexiconWithDebugName(debugName, type);
+        return parser.compileLexicon(name, type);
     }
 
     // ////////////////////////////////

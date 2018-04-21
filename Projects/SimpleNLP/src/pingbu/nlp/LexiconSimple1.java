@@ -27,24 +27,16 @@ public class LexiconSimple1 extends LexiconSimple {
             MyLog.logD(TAG, String.format(fmt, args));
     }
 
-    public static LexiconSimple1 load(String path) throws IOException {
-        return load(null, path);
-    }
-
-    public static LexiconSimple1 load(String debugName, String path)
+    public static LexiconSimple1 load(String name, boolean fuzzy, String path)
             throws IOException {
         try (FileInputStream f = new FileInputStream(path)) {
-            return load(debugName, f);
+            return load(name, fuzzy, f);
         }
     }
 
-    public static LexiconSimple1 load(InputStream f) throws IOException {
-        return load(null, f);
-    }
-
-    public static LexiconSimple1 load(String debugName, InputStream f)
+    public static LexiconSimple1 load(String name, boolean fuzzy, InputStream f)
             throws IOException {
-        final LexiconSimple1 lexicon = new LexiconSimple1(debugName);
+        final LexiconSimple1 lexicon = new LexiconSimple1(name, fuzzy);
         try (InputStreamReader in = new InputStreamReader(f, "UTF-8");
                 BufferedReader r = new BufferedReader(in)) {
             for (;;) {
@@ -67,6 +59,7 @@ public class LexiconSimple1 extends LexiconSimple {
         public ArrayList<Grammar.ItemParam> params;
     }
 
+    private final boolean mFuzzy;
     private final List<Item> mItems = new ArrayList<Item>();
     private final Map<String, Integer> mItemIndex = new HashMap<String, Integer>();
     private final Map<Short, List<MatchedItem>> mCharIndex = new HashMap<Short, List<MatchedItem>>();
@@ -94,31 +87,18 @@ public class LexiconSimple1 extends LexiconSimple {
         return params;
     }
 
-    public LexiconSimple1() {
-        super();
+    public LexiconSimple1(String name, boolean fuzzy) {
+        super(name);
+        mFuzzy = fuzzy;
     }
 
-    public LexiconSimple1(String debugName) {
-        super(debugName);
-    }
-
-    public LexiconSimple1(String[] items) {
-        this();
+    public LexiconSimple1(String name, boolean fuzzy, String[] items) {
+        this(name, fuzzy);
         addItems(items);
     }
 
-    public LexiconSimple1(Iterable<String> items) {
-        this();
-        addItems(items);
-    }
-
-    public LexiconSimple1(String debugName, String[] items) {
-        this(debugName);
-        addItems(items);
-    }
-
-    public LexiconSimple1(String debugName, Iterable<String> items) {
-        this(debugName);
+    public LexiconSimple1(String name, boolean fuzzy, Iterable<String> items) {
+        this(name, fuzzy);
         addItems(items);
     }
 
@@ -206,7 +186,7 @@ public class LexiconSimple1 extends LexiconSimple {
     }
 
     public final Collection<SearchResult> search(String text) {
-        log("Searching for %s in lexicon %s", text, id);
+        log("Searching for %s in lexicon %s", text, name);
         Map<Integer, SearchResult> results = new HashMap<Integer, SearchResult>();
         for (int i = 0; i < text.length(); ++i) {
             SearchResult r = null;
@@ -283,7 +263,8 @@ public class LexiconSimple1 extends LexiconSimple {
                         innerScore += matchedWords.get(k).score;
                     double score = (innerScore + matchedWords.get(i).scoreL
                             * matchedWords.get(j).scoreR)
-                            / Math.max(length, mItems.get(item).text.length());
+                            / (mFuzzy ? length : Math.max(length,
+                                    mItems.get(item).text.length()));
                     if (score >= THRESHOLD) {
                         int resultKey = (pos << 16) | length;
                         SearchResult r = results.get(resultKey);

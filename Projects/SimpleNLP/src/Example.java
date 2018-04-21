@@ -10,9 +10,10 @@ public class Example {
 
     private Grammar mGrammar = null;
 
-    private void __loadSlot(Parser parser, String name, String path) {
+    private void __loadSlot(Parser parser, String name, boolean fuzzy,
+            String path) {
         try {
-            parser.addSlot(name, LexiconSimple1.load(name, path));
+            parser.addSlot(name, LexiconSimple1.load(name, fuzzy, path));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -40,14 +41,14 @@ public class Example {
         Parser parser = new Parser();
 
         dataDir += "/nlp/";
-        __loadSlot(parser, "TVChannelName", dataDir + "TVChannel.txt");
-        __loadSlot(parser, "VideoName", dataDir + "Video.txt");
-        __loadSlot(parser, "Artist", dataDir + "Artist.txt");
-        __loadSlot(parser, "Type", dataDir + "Type.txt");
-        __loadSlot(parser, "Area", dataDir + "Area.txt");
-        __loadSlot(parser, "City", dataDir + "City.txt");
-        __loadSlot(parser, "StockName", dataDir + "Stock.txt");
-        __loadSlot(parser, "Lesson", dataDir + "Lesson.txt");
+        __loadSlot(parser, "TVChannelName", false, dataDir + "TVChannel.txt");
+        __loadSlot(parser, "VideoName", false, dataDir + "Video.txt");
+        __loadSlot(parser, "Artist", false, dataDir + "Artist.txt");
+        __loadSlot(parser, "Type", false, dataDir + "Type.txt");
+        __loadSlot(parser, "Area", false, dataDir + "Area.txt");
+        __loadSlot(parser, "City", false, dataDir + "City.txt");
+        __loadSlot(parser, "StockName", false, dataDir + "Stock.txt");
+        __loadSlot(parser, "Lesson", true, dataDir + "Lesson.txt");
 
         parser.addCompiledSlot("$Prefix", "[麻烦[你]]([请](帮|给|为)我)|我(想|要|想要)");
 
@@ -154,12 +155,15 @@ public class Example {
         t = System.currentTimeMillis() - t;
         System.out
                 .printf("==================================================\n");
+        System.out.printf("Text: %s\n", text);
         if (r != null) {
             System.out.printf("Result: %.3f\n", r.score);
             for (Map.Entry<String, String> param : r.params.entrySet())
                 if (!param.getKey().startsWith("$"))
                     System.out.printf("  %s=%s\n", param.getKey(),
                             param.getValue());
+        } else {
+            System.out.printf("Result: null\n");
         }
         System.out.printf(" duration: %.3fs\n", t / 1000.);
     }
@@ -170,6 +174,6 @@ public class Example {
         example.parse("麻烦帮我播放逻辑思维节目");
         example.parse("回看中央2台昨晚8点多钟的节目");
         example.parse("帮我查一下后天北京的天气");
-        example.parse("我想学格萨尔王的故事");
+        example.parse("我想学格萨尔王的课文");
     }
 }

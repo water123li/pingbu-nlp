@@ -6,12 +6,9 @@ package pingbu.nlp;
  * @author pingbu
  */
 public abstract class LexiconSimple extends Lexicon {
-    public LexiconSimple() {
-        super();
-    }
 
-    public LexiconSimple(String debugName) {
-        super(debugName);
+    public LexiconSimple(String name) {
+        super(name);
     }
 
     public abstract void addItems(String[] items);

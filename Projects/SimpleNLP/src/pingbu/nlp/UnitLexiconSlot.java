@@ -7,7 +7,7 @@ public class UnitLexiconSlot implements Unit {
 
     public UnitLexiconSlot(Lexicon lexicon) {
         mLexicon = lexicon;
-        mId = String.format("<%s>", lexicon.id);
+        mId = String.format("<%s>", lexicon.name);
     }
 
     @Override

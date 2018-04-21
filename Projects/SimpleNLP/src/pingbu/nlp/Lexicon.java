@@ -9,22 +9,13 @@ import java.util.Collection;
  */
 public abstract class Lexicon {
 
-    private static short sPrevId = 0;
+    public static final int TYPE_NORMAL = 0;
+    public static final int TYPE_FUZZY = 1;
 
-    public final String id;
+    public final String name;
 
-    public Lexicon() {
-        this(null);
-    }
-
-    public Lexicon(String debugName) {
-        if (debugName != null) {
-            id = debugName;
-        } else {
-            synchronized (Lexicon.class) {
-                id = Integer.toString(++sPrevId);
-            }
-        }
+    public Lexicon(String name) {
+        this.name = name;
     }
 
     public abstract int getItemCount();

@@ -112,31 +112,17 @@ public class LexiconSimple2 extends LexiconSimple {
         return params;
     }
 
-    public LexiconSimple2() {
-        super();
+    public LexiconSimple2(String name) {
+        super(name);
     }
 
-    public LexiconSimple2(String debugName) {
-        super(debugName);
-    }
-
-    public LexiconSimple2(String[] items) {
-        this();
+    public LexiconSimple2(String name, String[] items) {
+        this(name);
         addItems(items);
     }
 
-    public LexiconSimple2(Iterable<String> items) {
-        this();
-        addItems(items);
-    }
-
-    public LexiconSimple2(String debugName, String[] items) {
-        this(debugName);
-        addItems(items);
-    }
-
-    public LexiconSimple2(String debugName, Iterable<String> items) {
-        this(debugName);
+    public LexiconSimple2(String name, Iterable<String> items) {
+        this(name);
         addItems(items);
     }
 
@@ -228,7 +214,7 @@ public class LexiconSimple2 extends LexiconSimple {
     }
 
     public final Collection<SearchResult> search(String text) {
-        log_result("Searching for %s in lexicon %s", text, id);
+        log_result("Searching for %s in lexicon %s", text, name);
         Map<Integer, SearchResult> results = new HashMap<Integer, SearchResult>();
 
         final int textLength = text.length();
