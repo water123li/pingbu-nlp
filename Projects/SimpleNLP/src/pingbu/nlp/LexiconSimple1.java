@@ -252,8 +252,8 @@ public class LexiconSimple1 extends LexiconSimple {
                                 results.put(resultKey, r);
                             }
                             r.item = item;
-                            r.score = score;
-                            r.innerScore = innerScore;
+                            r.score = Math.min(score, 1);
+                            r.innerScore = Math.min(innerScore, length - 1);
                         }
                     }
                 }
