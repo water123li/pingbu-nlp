@@ -100,6 +100,21 @@ public abstract class NlpFile {
             mRoot = root;
         }
 
+        private final class StateComment implements GrammarAnalyzeState {
+            private final GrammarAnalyzeState mPrev;
+
+            public StateComment(final GrammarAnalyzeState prev) {
+                mPrev = prev;
+            }
+
+            @Override
+            public boolean analyze(final char c) throws GrammarAnalyzeException {
+                if (c == '\n')
+                    mState = mPrev;
+                return true;
+            }
+        }
+
         private final class StateBeforeTag implements GrammarAnalyzeState {
             private final StateAfterTag mNext;
 
@@ -109,11 +124,15 @@ public abstract class NlpFile {
 
             @Override
             public boolean analyze(final char c) throws GrammarAnalyzeException {
-                if (Character.isSpaceChar(c))
+                if (Character.isWhitespace(c))
                     return true;
                 if (__isTagHeadChar(c)) {
                     mState = new StateTag(mNext);
                     return false;
+                }
+                if (c == '#') {
+                    mState = new StateComment(this);
+                    return true;
                 }
                 throw new GrammarAnalyzeException("expect tag here");
             }
@@ -159,11 +178,15 @@ public abstract class NlpFile {
         private class StateAfterFunction extends StateAfterTag {
             @Override
             public boolean analyze(final char c) throws GrammarAnalyzeException {
-                if (Character.isSpaceChar(c))
+                if (Character.isWhitespace(c))
                     return true;
                 if (c == '(') {
                     mFunction = mTag.toString();
                     mState = new StateBeforeArgument();
+                    return true;
+                }
+                if (c == '#') {
+                    mState = new StateComment(this);
                     return true;
                 }
                 throw new GrammarAnalyzeException("expect '(' here");
@@ -173,7 +196,7 @@ public abstract class NlpFile {
         private class StateBeforeArgument extends StateAfterTag {
             @Override
             public boolean analyze(final char c) throws GrammarAnalyzeException {
-                if (Character.isSpaceChar(c))
+                if (Character.isWhitespace(c))
                     return true;
                 if (c == '"') {
                     mState = new StateString(new StateAfterArgument(
@@ -183,6 +206,10 @@ public abstract class NlpFile {
                 if (__isTagHeadChar(c)) {
                     mState = new StateTag(new StateAfterArgument(null));
                     return false;
+                }
+                if (c == '#') {
+                    mState = new StateComment(this);
+                    return true;
                 }
                 throw new GrammarAnalyzeException("expect parameter here");
             }
@@ -231,7 +258,7 @@ public abstract class NlpFile {
 
             @Override
             public boolean analyze(final char c) throws GrammarAnalyzeException {
-                if (Character.isSpaceChar(c))
+                if (Character.isWhitespace(c))
                     return true;
                 if (c == ',') {
                     __pushArg();
@@ -243,6 +270,10 @@ public abstract class NlpFile {
                     mState = new StateAfterLine();
                     return true;
                 }
+                if (c == '#') {
+                    mState = new StateComment(this);
+                    return true;
+                }
                 throw new GrammarAnalyzeException(
                         "expect ',' or ')' after a parameter");
             }
@@ -251,7 +282,7 @@ public abstract class NlpFile {
         private class StateAfterLine extends StateAfterTag {
             @Override
             public boolean analyze(final char c) throws GrammarAnalyzeException {
-                if (Character.isSpaceChar(c))
+                if (Character.isWhitespace(c))
                     return true;
                 if (c == ';') {
                     if (mLexicon != null) {
@@ -345,6 +376,10 @@ public abstract class NlpFile {
                     mState = new StateBeforeTag(new StateAfterTag1());
                     return true;
                 }
+                if (c == '#') {
+                    mState = new StateComment(this);
+                    return true;
+                }
                 throw new GrammarAnalyzeException("expect ';' here");
             }
         }
@@ -363,7 +398,7 @@ public abstract class NlpFile {
                         while (!mState.analyze(c))
                             ;
                     }
-                    while (!mState.analyze(' '))
+                    while (!mState.analyze('\n'))
                         ;
                 }
             } catch (final GrammarAnalyzeException e) {
