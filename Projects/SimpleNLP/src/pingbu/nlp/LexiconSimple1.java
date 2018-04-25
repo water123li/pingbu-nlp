@@ -1,10 +1,5 @@
 package pingbu.nlp;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -25,28 +20,6 @@ public class LexiconSimple1 extends LexiconSimple {
     private static final void log(String fmt, Object... args) {
         if (LOG)
             MyLog.logD(TAG, String.format(fmt, args));
-    }
-
-    public static LexiconSimple1 load(String name, boolean fuzzy, String path)
-            throws IOException {
-        try (FileInputStream f = new FileInputStream(path)) {
-            return load(name, fuzzy, f);
-        }
-    }
-
-    public static LexiconSimple1 load(String name, boolean fuzzy, InputStream f)
-            throws IOException {
-        final LexiconSimple1 lexicon = new LexiconSimple1(name, fuzzy);
-        try (InputStreamReader in = new InputStreamReader(f, "UTF-8");
-                BufferedReader r = new BufferedReader(in)) {
-            for (;;) {
-                String l = r.readLine();
-                if (l == null)
-                    break;
-                lexicon.addItem(l);
-            }
-        }
-        return lexicon;
     }
 
     private static final class MatchedItem {
