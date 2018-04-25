@@ -1,4 +1,4 @@
-package pingbu.common;
+package pingbu.nlp;
 
 import java.io.BufferedReader;
 import java.io.DataInputStream;
@@ -10,6 +10,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
+
+import pingbu.common.MyLog;
 
 /**
  * 拼音模块，用于支持语义和词典建模、搜索

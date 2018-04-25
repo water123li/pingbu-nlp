@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 
 import pingbu.common.MyLog;
-import pingbu.common.Pinyin;
 
 public class LexiconSimple1 extends LexiconSimple {
     private static final String TAG = LexiconSimple1.class.getSimpleName();

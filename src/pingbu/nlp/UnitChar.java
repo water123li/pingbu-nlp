@@ -1,6 +1,5 @@
 package pingbu.nlp;
 
-import pingbu.common.Pinyin;
 
 class UnitChar implements Unit {
 

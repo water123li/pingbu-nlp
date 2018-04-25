@@ -1,15 +1,15 @@
 import java.io.IOException;
 import java.util.Map;
 
-import pingbu.common.Pinyin;
 import pingbu.nlp.Grammar;
 import pingbu.nlp.NlpFile;
+import pingbu.nlp.Pinyin;
 
-public class Example {
+public class PingbuNlpExample {
 
     private Grammar mGrammar = null;
 
-    public Example() {
+    public PingbuNlpExample() {
         final String dataDir = "data";
         final String modalPath = dataDir + "/common/Pinyin.modal";
         try {
@@ -53,7 +53,7 @@ public class Example {
     }
 
     public static void main(String[] args) {
-        Example example = new Example();
+        PingbuNlpExample example = new PingbuNlpExample();
         example.parse("我享看去年美国的电视剧");
         example.parse("麻烦帮我播放逻辑思维节目");
         example.parse("我要点播新闻节目");

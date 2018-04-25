@@ -6,9 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import android.util.SparseArray;
 import pingbu.common.MyLog;
-import pingbu.common.Pinyin;
 
 /**
  * 模糊度更高，但效率较低，限制用在用户词典较为合适！
@@ -56,8 +54,8 @@ public class LexiconSimple2 extends LexiconSimple {
     private int mMaxWordLength = 0;
     private final List<Item> mItems = new ArrayList<Item>();
     private final Map<String, Integer> mItemIndex = new HashMap<String, Integer>();
-    private final SparseArray<List<IndexItem>> mSMIndex = new SparseArray<List<IndexItem>>();
-    private final SparseArray<List<IndexItem>> mYMIndex = new SparseArray<List<IndexItem>>();
+    private final Map<Integer, List<IndexItem>> mSMIndex = new HashMap<Integer, List<IndexItem>>();
+    private final Map<Integer, List<IndexItem>> mYMIndex = new HashMap<Integer, List<IndexItem>>();
 
     private static final ArrayList<Grammar.ItemParam> _parseParams(String desc) {
         ArrayList<Grammar.ItemParam> params = new ArrayList<Grammar.ItemParam>();
@@ -108,8 +106,8 @@ public class LexiconSimple2 extends LexiconSimple {
         addItem(text, null);
     }
 
-    private final List<IndexItem> _getIndex(SparseArray<List<IndexItem>> index,
-            int word) {
+    private final List<IndexItem> _getIndex(
+            Map<Integer, List<IndexItem>> index, int word) {
         List<IndexItem> r = index.get(word);
         if (r == null) {
             r = new ArrayList<IndexItem>();
@@ -118,7 +116,7 @@ public class LexiconSimple2 extends LexiconSimple {
         return r;
     }
 
-    private final void _addToIndex(SparseArray<List<IndexItem>> index,
+    private final void _addToIndex(Map<Integer, List<IndexItem>> index,
             int word, IndexItem indexItem) {
         _getIndex(index, word).add(indexItem);
     }
@@ -199,7 +197,7 @@ public class LexiconSimple2 extends LexiconSimple {
         }
         wordIndexes.remove(null);
 
-        final SparseArray<Double> matchedChars = new SparseArray<Double>();
+        final Map<Integer, Double> matchedChars = new HashMap<Integer, Double>();
         final MatchedWord[] matchedWords = new MatchedWord[textLength - 1];
         final int[] wordIndexPos = new int[wordIndexes.size()];
         for (;;) {
