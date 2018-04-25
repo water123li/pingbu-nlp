@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import pingbu.common.MyLog;
+import pingbu.common.Logger;
 
 /**
  * 语法树模块
@@ -22,12 +22,12 @@ public final class Grammar {
 
     private static final void log(String fmt, Object... args) {
         if (LOG)
-            MyLog.logD(TAG, String.format(fmt, args));
+            Logger.d(TAG, String.format(fmt, args));
     }
 
     private static final void log_result(String fmt, Object... args) {
         if (LOG_RESULT)
-            MyLog.logD(TAG, String.format(fmt, args));
+            Logger.d(TAG, String.format(fmt, args));
     }
 
     public static final class ItemSlot {

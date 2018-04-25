@@ -6,7 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import pingbu.common.MyLog;
+import pingbu.common.Logger;
+import pingbu.common.Pinyin;
 
 /**
  * 模糊度更高，但效率较低，限制用在用户词典较为合适！
@@ -22,12 +23,12 @@ public class LexiconSimple2 extends LexiconSimple {
 
     private static final void log(String fmt, Object... args) {
         if (LOG)
-            MyLog.logD(TAG, String.format(fmt, args));
+            Logger.d(TAG, String.format(fmt, args));
     }
 
     private static final void log_result(String fmt, Object... args) {
         if (LOG_RESULT)
-            MyLog.logD(TAG, String.format(fmt, args));
+            Logger.d(TAG, String.format(fmt, args));
     }
 
     private static final class Item {

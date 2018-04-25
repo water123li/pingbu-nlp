@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import pingbu.common.FileStreamBuilder;
-import pingbu.common.MyLog;
+import pingbu.common.Logger;
 import pingbu.common.StreamBuilder;
 
 /**
@@ -24,7 +24,7 @@ public abstract class NlpFile {
 
     private static final void log(final String fmt, final Object... args) {
         if (LOG)
-            MyLog.logD(TAG, String.format(fmt, args));
+            Logger.d(TAG, String.format(fmt, args));
     }
 
     public static Lexicon loadLexicon(final String name, final boolean fuzzy,
@@ -335,7 +335,7 @@ public abstract class NlpFile {
                                 if (lexicon != null)
                                     mParser.addSlot(mLexicon, lexicon);
                                 else
-                                    MyLog.logE(TAG, "failed loading lexicon '"
+                                    Logger.e(TAG, "failed loading lexicon '"
                                             + mLexicon + "'");
                             } else {
                                 throw new GrammarAnalyzeException(
@@ -402,7 +402,7 @@ public abstract class NlpFile {
                         ;
                 }
             } catch (final GrammarAnalyzeException e) {
-                MyLog.logE(TAG, String.format("Grammar error at (%d,%d): %s",
+                Logger.e(TAG, String.format("Grammar error at (%d,%d): %s",
                         line + 1, pos + 1, e.getMessage()));
             }
         }

@@ -1,9 +1,9 @@
 import java.io.IOException;
 import java.util.Map;
 
+import pingbu.common.Pinyin;
 import pingbu.nlp.Grammar;
 import pingbu.nlp.NlpFile;
-import pingbu.nlp.Pinyin;
 
 public class PingbuNlpExample {
 

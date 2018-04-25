@@ -5,7 +5,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import pingbu.common.MyLog;
+import pingbu.common.Logger;
 
 /**
  * 语法解析模块，用于解析语法描述，生成语法树或词典
@@ -19,12 +19,12 @@ public final class Parser {
 
     private static final void log(String fmt, Object... args) {
         if (LOG)
-            MyLog.logD(TAG, String.format(fmt, args));
+            Logger.d(TAG, String.format(fmt, args));
     }
 
     private static final void log_item(String fmt, Object... args) {
         if (LOG_ITEM)
-            MyLog.logD(TAG, String.format(fmt, args));
+            Logger.d(TAG, String.format(fmt, args));
     }
 
     private final Map<String, Subtree> mSlots = new HashMap<String, Subtree>();
@@ -123,14 +123,14 @@ public final class Parser {
                                 Integer.parseInt(slot.substring(p + 1)));
                         addSlot(slot, lexicon);
                     } catch (Exception e) {
-                        MyLog.logE(TAG, "slot <" + slot + "> invalid");
+                        Logger.e(TAG, "slot <" + slot + "> invalid");
                     }
                 }
             }
             if (mSlots.containsKey(slot)) {
                 return new SubtreeSlot(slot, mSlots.get(slot));
             } else {
-                MyLog.logE(TAG, "slot <" + slot + "> not found");
+                Logger.e(TAG, "slot <" + slot + "> not found");
                 return new SubtreeEmpty();
             }
         }

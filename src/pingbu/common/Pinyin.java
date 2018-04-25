@@ -1,4 +1,4 @@
-package pingbu.nlp;
+package pingbu.common;
 
 import java.io.BufferedReader;
 import java.io.DataInputStream;
@@ -10,8 +10,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
-
-import pingbu.common.MyLog;
 
 /**
  * 拼音模块，用于支持语义和词典建模、搜索
@@ -58,7 +56,7 @@ public final class Pinyin {
     private static final byte[][] sToneDistance = new byte[TONE_COUNT][TONE_COUNT];
 
     public static final void createModal(String unihanPath) throws IOException {
-        MyLog.logD(TAG, "==> _createModal");
+        Logger.d(TAG, "==> _createModal");
 
         try {
             for (byte i = 0; i < sNormalizedSMs.length; ++i)
@@ -212,12 +210,12 @@ public final class Pinyin {
                         sToneDistance[i][j] = sToneDistance[j][i];
                 }
         } finally {
-            MyLog.logD(TAG, "<== _createModal");
+            Logger.d(TAG, "<== _createModal");
         }
     }
 
     public static final void saveModal(String modalPath) throws IOException {
-        MyLog.logD(TAG, "==> saveModal " + modalPath);
+        Logger.d(TAG, "==> saveModal " + modalPath);
         try (FileOutputStream f = new FileOutputStream(modalPath);
                 DataOutputStream out = new DataOutputStream(f)) {
             out.write(sNormalizedSMs);
@@ -231,21 +229,21 @@ public final class Pinyin {
             for (int i = 0; i < TONE_COUNT; ++i)
                 out.write(sToneDistance[i]);
         } finally {
-            MyLog.logD(TAG, "<== saveModal");
+            Logger.d(TAG, "<== saveModal");
         }
     }
 
     public static final void loadModal(String modalPath) throws IOException {
-        MyLog.logD(TAG, "==> loadModal " + modalPath);
+        Logger.d(TAG, "==> loadModal " + modalPath);
         try (FileInputStream f = new FileInputStream(modalPath)) {
             loadModal(f);
         } finally {
-            MyLog.logD(TAG, "<== loadModal");
+            Logger.d(TAG, "<== loadModal");
         }
     }
 
     public static final void loadModal(InputStream f) throws IOException {
-        MyLog.logD(TAG, "==> loadModal");
+        Logger.d(TAG, "==> loadModal");
         try (DataInputStream in = new DataInputStream(f)) {
             in.read(sNormalizedSMs);
             in.read(sNormalizedYMs);
@@ -258,7 +256,7 @@ public final class Pinyin {
             for (int i = 0; i < TONE_COUNT; ++i)
                 in.read(sToneDistance[i]);
         } finally {
-            MyLog.logD(TAG, "<== loadModal");
+            Logger.d(TAG, "<== loadModal");
         }
     }
 

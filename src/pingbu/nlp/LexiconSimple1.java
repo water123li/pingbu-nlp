@@ -8,7 +8,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import pingbu.common.MyLog;
+import pingbu.common.Logger;
+import pingbu.common.Pinyin;
 
 public class LexiconSimple1 extends LexiconSimple {
     private static final String TAG = LexiconSimple1.class.getSimpleName();
@@ -18,7 +19,7 @@ public class LexiconSimple1 extends LexiconSimple {
 
     private static final void log(String fmt, Object... args) {
         if (LOG)
-            MyLog.logD(TAG, String.format(fmt, args));
+            Logger.d(TAG, String.format(fmt, args));
     }
 
     private static final class MatchedItem {
