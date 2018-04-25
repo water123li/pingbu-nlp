@@ -3,26 +3,23 @@ package pingbu.nlp;
 public class UnitLexiconSlotResult extends UnitLexiconSlot implements
         Unit.Result {
 
-    private Lexicon.SearchResult mResult;
+    private final String mSourceText;
+    private final Lexicon.SearchResult mResult;
 
-    public UnitLexiconSlotResult(Lexicon lexicon, Lexicon.SearchResult result) {
+    public UnitLexiconSlotResult(final Lexicon lexicon,
+            final String sourceText, final Lexicon.SearchResult result) {
         super(lexicon);
+        mSourceText = sourceText;
         mResult = result;
     }
 
     @Override
-    public int getSourcePos() {
-        return mResult.pos;
-    }
-
-    @Override
-    public int getSourceLength() {
-        return mResult.length;
-    }
-
-    @Override
     public String getText() {
-        return mLexicon.getItemText(mResult.item);
+        if (mLexicon.getType() == Lexicon.TYPE_FUZZY)
+            return mSourceText.substring(mResult.pos, mResult.pos
+                    + mResult.length);
+        else
+            return mLexicon.getItemText(mResult.item);
     }
 
     @Override

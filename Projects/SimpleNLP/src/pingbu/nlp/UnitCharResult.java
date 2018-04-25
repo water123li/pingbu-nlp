@@ -4,21 +4,8 @@ import pingbu.common.Pinyin;
 
 class UnitCharResult extends UnitChar implements Unit.Result {
 
-    private int mPosition;
-
-    public UnitCharResult(int pos, char c) {
+    public UnitCharResult(char c) {
         super(c);
-        mPosition = pos;
-    }
-
-    @Override
-    public int getSourcePos() {
-        return mPosition;
-    }
-
-    @Override
-    public int getSourceLength() {
-        return 1;
     }
 
     @Override

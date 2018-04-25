@@ -11,9 +11,5 @@ interface Unit {
         public double getInnerScore();
 
         public double compare(Unit unit);
-
-        public int getSourcePos();
-
-        public int getSourceLength();
     }
 }

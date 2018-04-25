@@ -20,6 +20,8 @@ public abstract class Lexicon {
 
     public abstract int getItemCount();
 
+    public abstract int getType();
+
     public abstract String getItemText(int id);
 
     public abstract Collection<Grammar.ItemParam> getItemParams(int id);

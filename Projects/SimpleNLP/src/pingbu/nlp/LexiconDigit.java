@@ -101,6 +101,11 @@ class LexiconDigit extends Lexicon {
     }
 
     @Override
+    public final int getType() {
+        return Lexicon.TYPE_NORMAL;
+    }
+
+    @Override
     public int getItemCount() {
         return mLexicon.getItemCount();
     }

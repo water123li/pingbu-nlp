@@ -1,10 +1,5 @@
 package pingbu.nlp;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -35,36 +30,6 @@ public class LexiconSimple2 extends LexiconSimple {
     private static final void log_result(String fmt, Object... args) {
         if (LOG_RESULT)
             MyLog.logD(TAG, String.format(fmt, args));
-    }
-
-    public static LexiconSimple2 load(String path) throws IOException {
-        return load(null, path);
-    }
-
-    public static LexiconSimple2 load(String debugName, String path)
-            throws IOException {
-        try (FileInputStream f = new FileInputStream(path)) {
-            return load(debugName, f);
-        }
-    }
-
-    public static LexiconSimple2 load(InputStream f) throws IOException {
-        return load(null, f);
-    }
-
-    public static LexiconSimple2 load(String debugName, InputStream f)
-            throws IOException {
-        final LexiconSimple2 lexicon = new LexiconSimple2(debugName);
-        try (InputStreamReader in = new InputStreamReader(f, "UTF-8");
-                BufferedReader r = new BufferedReader(in)) {
-            for (;;) {
-                String l = r.readLine();
-                if (l == null)
-                    break;
-                lexicon.addItem(l);
-            }
-        }
-        return lexicon;
     }
 
     private static final class Item {
@@ -170,6 +135,11 @@ public class LexiconSimple2 extends LexiconSimple {
             _addToIndex(mSMIndex, Pinyin.getSM(nc), ii);
             _addToIndex(mYMIndex, Pinyin.getYM(nc), ii);
         }
+    }
+
+    @Override
+    public final int getType() {
+        return Lexicon.TYPE_NORMAL;
     }
 
     @Override

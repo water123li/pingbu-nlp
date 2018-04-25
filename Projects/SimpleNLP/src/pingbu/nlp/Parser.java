@@ -139,7 +139,7 @@ public final class Parser {
     public final void addCompiledSlot(String name, String desc) {
         log("==> addCompiledSlot %s <-- %s", name, desc);
         addSlot(name,
-                __compileLexicon(name, 1, new _Parser(desc, null).parse()),
+                __compileLexicon(name, 0, new _Parser(desc, null).parse()),
                 null);
         log("<== addCompiledSlot %s", name);
     }
@@ -271,7 +271,7 @@ public final class Parser {
     }
 
     public static final LexiconSimple compileLexicon(String name, String desc) {
-        return compileLexicon(name, desc, 1);
+        return compileLexicon(name, desc, 0);
     }
 
     public static final LexiconSimple compileLexicon(String name, String desc,

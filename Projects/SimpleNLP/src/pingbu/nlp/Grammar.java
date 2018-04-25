@@ -17,7 +17,7 @@ public final class Grammar {
     private static final String TAG = Grammar.class.getSimpleName();
 
     private static final boolean MT = false;
-    private static final boolean LOG = false;
+    private static final boolean LOG = true;
     private static final boolean LOG_RESULT = true;
 
     private static final void log(String fmt, Object... args) {
@@ -131,7 +131,7 @@ public final class Grammar {
             for (int pos = 0; pos < mPosLexiconSearchResults.length; ++pos) {
                 mPosLexiconSearchResults[pos] = new LexiconSearchResultList();
                 LexiconSearchResult lr = new LexiconSearchResult();
-                lr.unitResult = new UnitCharResult(pos, mText.charAt(pos));
+                lr.unitResult = new UnitCharResult(mText.charAt(pos));
                 lr.length = 1;
                 mPosLexiconSearchResults[pos].add(lr);
             }
@@ -141,7 +141,7 @@ public final class Grammar {
                     for (Lexicon.SearchResult r : rs) {
                         LexiconSearchResult lr = new LexiconSearchResult();
                         lr.unitResult = new UnitLexiconSlotResult(
-                                mLexicons.get(lexicon), r);
+                                mLexicons.get(lexicon), mText, r);
                         lr.length = r.length;
                         mPosLexiconSearchResults[r.pos].add(lr);
                     }
@@ -316,19 +316,16 @@ public final class Grammar {
                     continue;
                 Lexicon lexicon = ((UnitLexiconSlotResult) unitResult).mLexicon;
                 int id = lexicon.findItem(unitText);
-                if (id < 0) {
-                    MyLog.logE(TAG, "not found " + unitResult.getId());
-                    continue;
-                }
-                for (ItemParam param : lexicon.getItemParams(id)) {
-                    String v = param.value;
-                    if (v.equals("<0>"))
-                        v = unitText;
-                    else if (v.startsWith("<") && v.endsWith(">"))
-                        v = slots.get(v.substring(1, v.length() - 1));
-                    slots.put(param.key, v);
-                    // log(" lexicon item param %s = %s", param.key, v);
-                }
+                if (id >= 0)
+                    for (ItemParam param : lexicon.getItemParams(id)) {
+                        String v = param.value;
+                        if (v.equals("<0>"))
+                            v = unitText;
+                        else if (v.startsWith("<") && v.endsWith(">"))
+                            v = slots.get(v.substring(1, v.length() - 1));
+                        slots.put(param.key, v);
+                        log(" lexicon item param %s = %s", param.key, v);
+                    }
             }
 
             long t = System.currentTimeMillis();

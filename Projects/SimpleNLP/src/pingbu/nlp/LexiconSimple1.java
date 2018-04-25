@@ -128,6 +128,11 @@ public class LexiconSimple1 extends LexiconSimple {
     }
 
     @Override
+    public final int getType() {
+        return mFuzzy ? Lexicon.TYPE_FUZZY : Lexicon.TYPE_NORMAL;
+    }
+
+    @Override
     public final int getItemCount() {
         return mItems.size();
     }

@@ -14,6 +14,11 @@ public class LexiconWrapper extends Lexicon {
     }
 
     @Override
+    public final int getType() {
+        return mLexicon.getType();
+    }
+
+    @Override
     public int getItemCount() {
         return mLexicon.getItemCount();
     }
