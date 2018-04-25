@@ -1,4 +1,3 @@
-import java.io.IOException;
 import java.util.Map;
 
 import pingbu.common.Pinyin;
@@ -11,21 +10,7 @@ public class PingbuNlpExample {
 
     public PingbuNlpExample() {
         final String dataDir = "data";
-        final String modalPath = dataDir + "/common/Pinyin.modal";
-        try {
-            Pinyin.loadModal(modalPath);
-        } catch (IOException e1) {
-            try {
-                Pinyin.createModal(dataDir + "/common/Unihan_Readings.txt");
-                try {
-                    Pinyin.saveModal(modalPath);
-                } catch (IOException e) {
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-                System.exit(-1);
-            }
-        }
+        Pinyin.init(dataDir + "/common");
         System.out.printf("Loading grammar...\n");
         long t = System.currentTimeMillis();
         mGrammar = NlpFile.loadGrammar(dataDir + "/nlp/Grammar.txt");
@@ -56,7 +41,7 @@ public class PingbuNlpExample {
         PingbuNlpExample example = new PingbuNlpExample();
         example.parse("我享看去年美国的电视剧");
         example.parse("麻烦帮我播放逻辑思维节目");
-        example.parse("我要点播新闻节目");
+        example.parse("我要点播闯关节目");
         example.parse("回看中央2台昨晚8点多钟的节目");
         example.parse("帮我查一下后天北京的天气");
     }

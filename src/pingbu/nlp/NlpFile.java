@@ -9,9 +9,9 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
-import pingbu.common.FileStreamBuilder;
+import pingbu.common.FileStorage;
 import pingbu.common.Logger;
-import pingbu.common.StreamBuilder;
+import pingbu.common.Storage;
 
 /**
  * Class for loading lexicon or grammar from stream such as file
@@ -38,8 +38,8 @@ public abstract class NlpFile {
     }
 
     public static Lexicon loadLexicon(final String name, final boolean fuzzy,
-            final StreamBuilder root, final String fileName) {
-        try (final InputStream in = root.open(fileName)) {
+            final Storage storage, final String fileName) {
+        try (final InputStream in = storage.open(fileName)) {
             return loadLexicon(name, fuzzy, in);
         } catch (final IOException e) {
             e.printStackTrace();
@@ -89,15 +89,15 @@ public abstract class NlpFile {
 
     private static final class GrammarAnalyzer {
         private final Parser mParser = new Parser();
-        private final StreamBuilder mRoot;
+        private final Storage mStorage;
 
         private GrammarAnalyzeState mState = new StateBeforeTag(
                 new StateAfterTag1());
         private String mLexicon = null, mFunction = null;
         private final List<Object> mArgs = new ArrayList<Object>();
 
-        public GrammarAnalyzer(final StreamBuilder root) {
-            mRoot = root;
+        public GrammarAnalyzer(final Storage storage) {
+            mStorage = storage;
         }
 
         private final class StateComment implements GrammarAnalyzeState {
@@ -331,7 +331,7 @@ public abstract class NlpFile {
                                     log("%s = load(\"%s\")", mLexicon, fileName);
                                 }
                                 final Lexicon lexicon = loadLexicon(mLexicon,
-                                        fuzzy, mRoot, fileName);
+                                        fuzzy, mStorage, fileName);
                                 if (lexicon != null)
                                     mParser.addSlot(mLexicon, lexicon);
                                 else
@@ -415,15 +415,14 @@ public abstract class NlpFile {
     public static Grammar loadGrammar(final String path) {
         final String fullPath = new File(path).getAbsolutePath();
         final int p = fullPath.lastIndexOf(File.separatorChar) + 1;
-        final StreamBuilder root = new FileStreamBuilder(fullPath.substring(0,
-                p));
-        return loadGrammar(root, fullPath.substring(p));
+        final Storage storage = new FileStorage(fullPath.substring(0, p));
+        return loadGrammar(storage, fullPath.substring(p));
     }
 
-    public static Grammar loadGrammar(final StreamBuilder root,
+    public static Grammar loadGrammar(final Storage storage,
             final String fileName) {
-        try (final InputStream s = root.open(fileName)) {
-            final GrammarAnalyzer grammarAnalyzer = new GrammarAnalyzer(root);
+        try (final InputStream s = storage.open(fileName)) {
+            final GrammarAnalyzer grammarAnalyzer = new GrammarAnalyzer(storage);
             grammarAnalyzer.load(s);
             return grammarAnalyzer.compile();
         } catch (final IOException e) {

@@ -4,10 +4,10 @@ import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -55,8 +55,8 @@ public final class Pinyin {
     private static final byte[][] sYmDistance = new byte[YMs.length][YMs.length];
     private static final byte[][] sToneDistance = new byte[TONE_COUNT][TONE_COUNT];
 
-    public static final void createModal(String unihanPath) throws IOException {
-        Logger.d(TAG, "==> _createModal");
+    public static final void createModal(InputStream f) throws IOException {
+        Logger.d(TAG, "==> createModal");
 
         try {
             for (byte i = 0; i < sNormalizedSMs.length; ++i)
@@ -114,41 +114,37 @@ public final class Pinyin {
             sCharSmYmTone['V'] = sCharSmYmTone['v'] = _pinyinToSmYmTone("wei");
             sCharSmYmTone['Y'] = sCharSmYmTone['y'] = _pinyinToSmYmTone("wai");
 
-            try (FileInputStream f = new FileInputStream(unihanPath);
-                    InputStreamReader in = new InputStreamReader(f, "UTF-8");
-                    BufferedReader r = new BufferedReader(in)) {
-                for (;;) {
-                    String l = r.readLine();
-                    if (l == null)
-                        break;
-                    if (l.startsWith("U+")) {
-                        String[] p = l.split("\t");
-                        if (p[1].equals("kMandarin")) {
-                            int u = Integer.parseInt(p[0].substring(2), 16);
-                            String pinyin = p[2];
-                            int tone = 0;
-                            // System.out.printf("%d: %s\n", u, pinyin);
-                            for (int i = 0; i < 8 * 4; ++i) {
-                                char c = "āáǎàōóǒòēéěèīíǐìūúǔù_ǘǚǜ_ḿ___ńňǹ"
-                                        .charAt(i);
-                                int a = pinyin.indexOf(c);
-                                if (a >= 0) {
-                                    pinyin = pinyin.substring(0, a)
-                                            + "aoeiuümn".charAt(i / 4)
-                                            + pinyin.substring(a + 1);
-                                    tone = (i % 4) + 1;
-                                    break;
-                                }
+            BufferedReader r = new BufferedReader(new InputStreamReader(f,
+                    "UTF-8"));
+            for (;;) {
+                String l = r.readLine();
+                if (l == null)
+                    break;
+                if (l.startsWith("U+")) {
+                    String[] p = l.split("\t");
+                    if (p[1].equals("kMandarin")) {
+                        int u = Integer.parseInt(p[0].substring(2), 16);
+                        String pinyin = p[2];
+                        int tone = 0;
+                        // System.out.printf("%d: %s\n", u, pinyin);
+                        for (int i = 0; i < 8 * 4; ++i) {
+                            char c = "āáǎàōóǒòēéěèīíǐìūúǔù_ǘǚǜ_ḿ___ńňǹ"
+                                    .charAt(i);
+                            int a = pinyin.indexOf(c);
+                            if (a >= 0) {
+                                pinyin = pinyin.substring(0, a)
+                                        + "aoeiuümn".charAt(i / 4)
+                                        + pinyin.substring(a + 1);
+                                tone = (i % 4) + 1;
+                                break;
                             }
-                            pinyin = pinyin.replace('ü', 'v');
-                            short SmYmTone = _pinyinToSmYmTone(pinyin);
-                            if (u < sCharSmYmTone.length)
-                                sCharSmYmTone[u] = (short) (SmYmTone | tone);
                         }
+                        pinyin = pinyin.replace('ü', 'v');
+                        short SmYmTone = _pinyinToSmYmTone(pinyin);
+                        if (u < sCharSmYmTone.length)
+                            sCharSmYmTone[u] = (short) (SmYmTone | tone);
                     }
                 }
-
-            } catch (IOException e) {
             }
 
             // for (int i = 0; i < PINYINs.length; ++i)
@@ -210,14 +206,14 @@ public final class Pinyin {
                         sToneDistance[i][j] = sToneDistance[j][i];
                 }
         } finally {
-            Logger.d(TAG, "<== _createModal");
+            Logger.d(TAG, "<== createModal");
         }
     }
 
-    public static final void saveModal(String modalPath) throws IOException {
-        Logger.d(TAG, "==> saveModal " + modalPath);
-        try (FileOutputStream f = new FileOutputStream(modalPath);
-                DataOutputStream out = new DataOutputStream(f)) {
+    public static final void saveModal(OutputStream f) throws IOException {
+        Logger.d(TAG, "==> saveModal");
+        try {
+            DataOutputStream out = new DataOutputStream(f);
             out.write(sNormalizedSMs);
             out.write(sNormalizedYMs);
             for (int i = 0; i < sCharSmYmTone.length; ++i)
@@ -230,15 +226,6 @@ public final class Pinyin {
                 out.write(sToneDistance[i]);
         } finally {
             Logger.d(TAG, "<== saveModal");
-        }
-    }
-
-    public static final void loadModal(String modalPath) throws IOException {
-        Logger.d(TAG, "==> loadModal " + modalPath);
-        try (FileInputStream f = new FileInputStream(modalPath)) {
-            loadModal(f);
-        } finally {
-            Logger.d(TAG, "<== loadModal");
         }
     }
 
@@ -257,6 +244,26 @@ public final class Pinyin {
                 in.read(sToneDistance[i]);
         } finally {
             Logger.d(TAG, "<== loadModal");
+        }
+    }
+
+    public static final void init(String path) {
+        init(new FileStorage(path));
+    }
+
+    public static final void init(Storage storage) {
+        try (InputStream in = storage.open("Pinyin.modal")) {
+            loadModal(in);
+        } catch (IOException e0) {
+            try (InputStream in = storage.open("Unihan_Readings.txt")) {
+                createModal(in);
+                try (OutputStream out = storage.create("Pinyin.modal")) {
+                    saveModal(out);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                throw new RuntimeException(e);
+            }
         }
     }
 

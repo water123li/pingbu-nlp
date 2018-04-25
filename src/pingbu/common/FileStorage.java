@@ -7,10 +7,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-public class FileStreamBuilder implements StreamBuilder {
+public class FileStorage implements Storage {
     private final String mRoot;
 
-    public FileStreamBuilder(final String root) {
+    public FileStorage(final String root) {
         if (root.endsWith(File.separator))
             mRoot = root;
         else
