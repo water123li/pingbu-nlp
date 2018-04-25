@@ -5,9 +5,9 @@
 # load lexicons from file
 TVChannelName = load("TVChannel.txt");
 VideoName = load("Video.txt");
+VideoKeyword = load("Video.txt", true);
 Artist = load("Artist.txt");
 Type = load("Type.txt");
-Lesson = load("Lesson.txt", true);
 Area = load("Area.txt");
 City = load("City.txt");
 StockName = load("Stock.txt");
@@ -30,9 +30,11 @@ $DateTime = define("<Date>|[<Date>[的]]<Time>");
 # define grammar for video
 Category = compile("影视[剧]|电影|[影]片|[电视]剧|剧集|[电视]节目|动漫");
 define("[[<$Prefix>]打开](搜视榜|点播[应用])", "action=video");
-$VideoAction = compile("(查|找|查找|搜[索]|打开|点播|看|播|放|播放)[[一]下]");
 Order = compile("热门|热播|好看|好评|最新|最近");
+$VideoAction = compile("(查|找|查找|搜[索]|打开|点播|看|播|放|播放)[[一]下]");
 define("[[<$Prefix>]<$VideoAction>][[([<Artist>[<Role>]]&[<Order>]&[<Area>]&[<$DateRange>])[的|嘅]][<Type>]<Category>][<VideoName>[节目|<Category>][<Episode>]]", "action=video");
+$VideoAction2 = compile("(点播|看|播|放|播放)[[一]下]");
+define("[[<$Prefix>]<$VideoAction2>][[([<Artist>[<Role>]]&[<Order>]&[<Area>]&[<$DateRange>])[的|嘅]][<Type>]<Category>][<VideoKeyword>[节目|<Category>][<Episode>]]", "action=video");
 
 # define grammar for TV
 $TVChannel = define("<TVChannelName>|<Digit:1-99>[频道|台]|频道<Digit:1-99>|(上|下|前|后)[一]个[频道|台])");
@@ -48,9 +50,6 @@ define("[[<$Prefix>](回看|打开|(调|跳|转|换|切[换])到)][<$TVChannel>]
 Music = define("<MusicName>|<Artist>(的|嘅)(歌[曲]|音乐)[<MusicName>]|<MusicType>");
 define("[[<$Prefix>](听|播|放|播放|打开)](歌[曲]|音乐|<Music>)", "action=music");
 define("[<$Prefix>](唱K|([演]唱|K)(歌[曲]|<Music>))", "action=ktv");
-
-# define grammar for education
-define("[[<$Prefix>](学[习])]<Lesson>[课文]", "action=learn");
 
 # define grammar for weather
 $QueryAction = compile("(查|查询|查看|搜[索]|看|睇|问[你])[[一]下]|查查看|看看|问问看|问问你");
