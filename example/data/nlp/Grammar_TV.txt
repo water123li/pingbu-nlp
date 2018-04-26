@@ -1,0 +1,15 @@
+#=====================
+# grammar file for TV
+#---------------------
+
+TVChannelName = load("TVChannel.txt");
+
+$TVChannel = define("<TVChannelName>|<Digit:1-99>[频道|台]|频道<Digit:1-99>|(上|下|前|后)[一]个[频道|台])");
+
+define("[[<$Prefix>]([收]看]|播放)(电视|[电视]直播)|[[<$Prefix>]打开]直播[应用]", "action=tvlive");
+define("[[<$Prefix>]([收]看|打开|播放]<TVChannelCategory>[频道]", "action=tvlive");
+define("[[<$Prefix>]([收]看|打开|播放)]<$TVChannel>[[的|嘅]节目]", "action=tvlive");
+define("[[<$Prefix>](调|跳|转|换|切[换])到]<$TVChannel>", "action=tvlive");
+define("[<$Prefix>][打开]回看[应用]", "action=tvback");
+define("[<$Prefix>]回看[电视|<$TVChannel>]", "action=tvback");
+define("[[<$Prefix>](回看|打开|(调|跳|转|换|切[换])到)][<$TVChannel>]<$DateTime>[[的|嘅]节目]", "action=tvback");
