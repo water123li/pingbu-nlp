@@ -299,11 +299,8 @@ public final class Grammar {
             }
 
             for (ItemParam param : mBestPathParams) {
-                String v = param.value;
-                if (v.startsWith("<") && v.endsWith(">"))
-                    v = slots.get(v.substring(1, v.length() - 1));
-                slots.put(param.key, v);
-                log(" grammar param %s = %s", param.key, v);
+                slots.put(param.key, param.value);
+                log(" grammar param %s = %s", param.key, param.value);
             }
 
             for (SearchNode node : nodes) {
@@ -321,11 +318,25 @@ public final class Grammar {
                         String v = param.value;
                         if (v.equals("<0>"))
                             v = unitText;
-                        else if (v.startsWith("<") && v.endsWith(">"))
-                            v = slots.get(v.substring(1, v.length() - 1));
                         slots.put(param.key, v);
                         log(" lexicon item param %s = %s", param.key, v);
                     }
+            }
+
+            for (;;) {
+                boolean pending = false;
+                for (Map.Entry<String, String> slot : slots.entrySet()) {
+                    String v = slot.getValue();
+                    if (v.startsWith("<") && v.endsWith(">")) {
+                        String v1 = slots.get(v.substring(1, v.length() - 1));
+                        if (v1.startsWith("<") && v1.endsWith(">"))
+                            pending = true;
+                        else
+                            slot.setValue(v1);
+                    }
+                }
+                if (!pending)
+                    break;
             }
 
             long t = System.currentTimeMillis();

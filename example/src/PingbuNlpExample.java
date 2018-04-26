@@ -20,17 +20,18 @@ public class PingbuNlpExample {
 
     public void parse(String text) {
         long t = System.currentTimeMillis();
-        Grammar.SearchResult r = mGrammar.search(text);
+        final Grammar.SearchResult r = mGrammar.search(text);
         t = System.currentTimeMillis() - t;
         System.out
                 .printf("==================================================\n");
         System.out.printf("Text: %s\n", text);
         if (r != null) {
             System.out.printf("Result: %.3f\n", r.score);
-            for (Map.Entry<String, String> param : r.params.entrySet())
-                if (!param.getKey().startsWith("$"))
-                    System.out.printf("  %s=%s\n", param.getKey(),
-                            param.getValue());
+            for (final Map.Entry<String, String> param : r.params.entrySet()) {
+                final String key = param.getKey();
+                if (!key.startsWith("$") && !key.startsWith("Digit:"))
+                    System.out.printf("  %s=%s\n", key, param.getValue());
+            }
         } else {
             System.out.printf("Result: null\n");
         }
@@ -38,7 +39,7 @@ public class PingbuNlpExample {
     }
 
     public static void main(String[] args) {
-        PingbuNlpExample example = new PingbuNlpExample();
+        final PingbuNlpExample example = new PingbuNlpExample();
         example.parse("我享看去年美国的电视剧");
         example.parse("麻烦帮我播放逻辑思维节目");
         example.parse("我要点播闯关节目");
