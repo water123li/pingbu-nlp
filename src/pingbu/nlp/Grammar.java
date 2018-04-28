@@ -3,8 +3,10 @@ package pingbu.nlp;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import pingbu.common.Logger;
 
@@ -280,24 +282,23 @@ public final class Grammar {
 
             Map<String, String> slots = new HashMap<String, String>();
 
-            for (ItemSlot slotInfo : mBestPathSlots)
-                if (!slotInfo.name.startsWith("$")) {
-                    StringBuilder sb = new StringBuilder();
-                    for (int i = 0; i < slotInfo.length; ++i) {
-                        Unit.Result unitResult = nodes[slotInfo.pos + i].unitResult;
-                        if (unitResult != null) {
-                            String unitText = unitResult.getText();
-                            if (unitText != null)
-                                sb.append(unitText);
-                        }
-                    }
-                    if (sb.length() > 0) {
-                        String v = sb.toString();
-                        slots.put(slotInfo.name, v);
-                        log(" grammar slot [%d,%d] %s = %s", slotInfo.pos,
-                                slotInfo.length, slotInfo.name, v);
+            for (ItemSlot slotInfo : mBestPathSlots) {
+                StringBuilder sb = new StringBuilder();
+                for (int i = 0; i < slotInfo.length; ++i) {
+                    Unit.Result unitResult = nodes[slotInfo.pos + i].unitResult;
+                    if (unitResult != null) {
+                        String unitText = unitResult.getText();
+                        if (unitText != null)
+                            sb.append(unitText);
                     }
                 }
+                if (sb.length() > 0) {
+                    String v = sb.toString();
+                    slots.put(slotInfo.name, v);
+                    log(" grammar slot [%d,%d] %s = %s", slotInfo.pos,
+                            slotInfo.length, slotInfo.name, v);
+                }
+            }
 
             for (ItemParam param : mBestPathParams) {
                 slots.put(param.key, param.value);
@@ -330,6 +331,9 @@ public final class Grammar {
                     String v = slot.getValue();
                     if (v.startsWith("<") && v.endsWith(">")) {
                         String v1 = slots.get(v.substring(1, v.length() - 1));
+                        if (v1 == null)
+                            throw new RuntimeException("slot " + v
+                                    + " not found");
                         if (v1.startsWith("<") && v1.endsWith(">"))
                             pending = true;
                         else
@@ -339,6 +343,13 @@ public final class Grammar {
                 if (!pending)
                     break;
             }
+
+            final Set<String> toRemoveSlots = new HashSet<String>();
+            for (final String slot : slots.keySet())
+                if (slot.startsWith("$") || slot.startsWith("Digit:"))
+                    toRemoveSlots.add(slot);
+            for (final String slot : toRemoveSlots)
+                slots.remove(slot);
 
             long t = System.currentTimeMillis();
             log_result(" tree search finish, %.3fs time used", (t - t0) / 1000.);
