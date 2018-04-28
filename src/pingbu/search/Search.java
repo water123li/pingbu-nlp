@@ -73,7 +73,8 @@ public class Search {
         return s.substring(1);
     }
 
-    public Collection<Result> search(final Map<String, String> conditions) {
+    public Collection<Result> search(final Map<String, String> conditions,
+            final int limit) {
         Logger.d(TAG, "==> search " + formatItem(conditions));
         final List<Result> results = new ArrayList<Result>();
         final List<Iterator> iterators = new ArrayList<Iterator>();
@@ -104,6 +105,8 @@ public class Search {
                 return r0.score < r1.score ? 1 : r0.score == r1.score ? 0 : -1;
             }
         });
+        while (results.size() > limit)
+            results.remove(results.size() - 1);
         Logger.d(TAG, results.size() + " results <== search");
         return results;
     }
