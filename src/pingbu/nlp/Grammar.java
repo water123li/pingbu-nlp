@@ -112,7 +112,7 @@ public final class Grammar {
                             lexiconSearchThreads[lexicon].join();
                         } catch (Exception e) {
                             e.printStackTrace();
-                            System.exit(-1);
+                            throw new RuntimeException(e);
                         }
                     Collection<Lexicon.SearchResult> rs = lexiconSearchProcs[lexicon].results;
                     if (!rs.isEmpty()) {
@@ -280,23 +280,24 @@ public final class Grammar {
 
             Map<String, String> slots = new HashMap<String, String>();
 
-            for (ItemSlot slotInfo : mBestPathSlots) {
-                StringBuilder sb = new StringBuilder();
-                for (int i = 0; i < slotInfo.length; ++i) {
-                    Unit.Result unitResult = nodes[slotInfo.pos + i].unitResult;
-                    if (unitResult != null) {
-                        String unitText = unitResult.getText();
-                        if (unitText != null)
-                            sb.append(unitText);
+            for (ItemSlot slotInfo : mBestPathSlots)
+                if (!slotInfo.name.startsWith("$")) {
+                    StringBuilder sb = new StringBuilder();
+                    for (int i = 0; i < slotInfo.length; ++i) {
+                        Unit.Result unitResult = nodes[slotInfo.pos + i].unitResult;
+                        if (unitResult != null) {
+                            String unitText = unitResult.getText();
+                            if (unitText != null)
+                                sb.append(unitText);
+                        }
+                    }
+                    if (sb.length() > 0) {
+                        String v = sb.toString();
+                        slots.put(slotInfo.name, v);
+                        log(" grammar slot [%d,%d] %s = %s", slotInfo.pos,
+                                slotInfo.length, slotInfo.name, v);
                     }
                 }
-                if (sb.length() > 0) {
-                    String v = sb.toString();
-                    slots.put(slotInfo.name, v);
-                    log(" grammar slot [%d,%d] %s = %s", slotInfo.pos,
-                            slotInfo.length, slotInfo.name, v);
-                }
-            }
 
             for (ItemParam param : mBestPathParams) {
                 slots.put(param.key, param.value);
