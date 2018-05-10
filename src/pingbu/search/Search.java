@@ -23,6 +23,10 @@ public class Search {
     private final List<Map<String, String>> mItems = new ArrayList<Map<String, String>>();
     private final Map<String, Index> mIndexes = new HashMap<String, Index>();
 
+    protected Index getIndex(String field) {
+        return mIndexes.get(field);
+    }
+
     public void addField(final String name, final Index index) {
         mIndexes.put(name, index);
     }
@@ -43,20 +47,20 @@ public class Search {
     }
 
     public class Result {
-        private final int mId;
+        public final int id;
         public final double score;
 
         private Result(final int id, final double score) {
-            mId = id;
+            this.id = id;
             this.score = score;
         }
 
         public Map<String, String> getItem() {
-            return mItems.get(mId);
+            return mItems.get(id);
         }
 
         public Object getField(final String name) {
-            return mItems.get(mId).get(name);
+            return mItems.get(id).get(name);
         }
     }
 
@@ -79,10 +83,13 @@ public class Search {
         final List<Result> results = new ArrayList<Result>();
         final List<Iterator> iterators = new ArrayList<Iterator>();
         for (final Map.Entry<String, String> condition : conditions.entrySet()) {
-            final String field = condition.getKey();
-            final Index index = mIndexes.get(field);
-            if (index != null)
-                iterators.add(index.iterate(condition.getValue()));
+            final String value = condition.getValue();
+            if (value != null && !value.isEmpty()) {
+                final String field = condition.getKey();
+                final Index index = mIndexes.get(field);
+                if (index != null)
+                    iterators.add(index.iterate(value));
+            }
         }
         for (;;) {
             int item = Integer.MAX_VALUE;

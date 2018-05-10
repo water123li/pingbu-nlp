@@ -127,5 +127,9 @@ public class IndexSearch implements Index {
             score /= mText.length() * 5 - 4;
             return Math.min(score, 1);
         }
+
+        @Override
+        public void close() throws Exception {
+        }
     }
 }

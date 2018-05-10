@@ -2,7 +2,7 @@ package pingbu.search;
 
 public interface Index {
 
-    public interface Iterator {
+    public interface Iterator extends AutoCloseable {
         int getNextItem();
 
         double sumupToItem(int id);

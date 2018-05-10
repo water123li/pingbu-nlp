@@ -13,9 +13,9 @@ Order = compile("热门|热播|好看|好评|最新|最近");
 $VideoAction = compile("(查|找|查找|搜[索]|打开|点播|看|播|放|播放)[[一]下]");
 $VideoAction2 = compile("(点播|看|播|放|播放)[[一]下]");
 
-define("[[<$Prefix>]打开](搜视榜|点播[应用])", "action=video");
-define("[[<$Prefix>]<$VideoAction>][[([<Artist>[<Role>]]&[<Order>]&[<Area>]&[<$DateRange>])[的|嘅]][<Type>]<Category>][<VideoName>[节目|<Category>][<Episode>]]", "action=video");
-define("[[<$Prefix>]<$VideoAction2>][[([<Artist>[<Role>]]&[<Order>]&[<Area>]&[<$DateRange>])[的|嘅]][<Type>]<Category>][<VideoKeyword>[节目|<Category>][<Episode>]]", "action=video");
+define("[[<$Prefix>]打开](搜视榜|点播[应用])", "action=video.launch");
+define("[[<$Prefix>]<$VideoAction>][[([<Artist>[<Role>]]&[<Order>]&[<Area>]&[<$DateRange>])[的|嘅]][<Type>]<Category>][<VideoName>[节目|<Category>][<Episode>]]", "action=video.search");
+define("[[<$Prefix>]<$VideoAction2>][[([<Artist>[<Role>]]&[<Order>]&[<Area>]&[<$DateRange>])[的|嘅]][<Type>]<Category>][<VideoKeyword>[节目|<Category>][<Episode>]]", "action=video.search");
 
 # define grammar for play control
 define("[[<$Prefix>](打开|[查]看)]播放记录", "action=播放记录");

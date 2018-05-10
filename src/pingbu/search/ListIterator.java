@@ -25,4 +25,8 @@ public class ListIterator implements Index.Iterator {
         }
         return 0;
     }
+
+    @Override
+    public void close() throws Exception {
+    }
 }
