@@ -2,15 +2,23 @@ package pingbu.common;
 
 import java.io.*;
 
+/**
+ * Jar包文件存储类
+ */
 public class JarStorage implements Storage {
     private final ClassLoader mClassLoader;
 
+    /**
+     * 初始化Jar包文件存储类
+     *
+     * @param classLoader Jar包类加载器对象
+     */
     public JarStorage(final ClassLoader classLoader) {
         mClassLoader = classLoader;
     }
 
     @Override
-    public boolean exists(String name) throws IOException {
+    public boolean exists(String name) {
         return mClassLoader.getResource(name) != null;
     }
 

@@ -2,30 +2,30 @@ package pingbu.search;
 
 import java.util.List;
 
-public class MultiIterator implements Index.Iterator {
-    private final List<Index.Iterator> mIterators;
+class MultiIterator implements SearchIndex.Iterator {
+    private final List<SearchIndex.Iterator> mIterators;
 
-    public MultiIterator(final List<Index.Iterator> iterators) {
+    public MultiIterator(final List<SearchIndex.Iterator> iterators) {
         mIterators = iterators;
     }
 
     @Override
     public int getNextItem() {
         int id = Integer.MAX_VALUE;
-        for (final Index.Iterator iterator : mIterators)
+        for (final SearchIndex.Iterator iterator : mIterators)
             id = Math.min(id, iterator.getNextItem());
         return id;
     }
 
     @Override
-    public double sumupToItem(final int id) {
+    public double sumUpToItem(final int id) {
         double score = 0;
-        for (final Index.Iterator iterator : mIterators)
-            score = Math.max(score, iterator.sumupToItem(id));
+        for (final SearchIndex.Iterator iterator : mIterators)
+            score = Math.max(score, iterator.sumUpToItem(id));
         return score;
     }
 
     @Override
-    public void close() throws Exception {
+    public void close() {
     }
 }

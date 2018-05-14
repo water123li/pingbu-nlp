@@ -25,16 +25,14 @@ public final class Pinyin {
     private static final byte YM_WEIGHT = 50;
     private static final byte TONE_WEIGHT = 10;
 
-    private static final String[] sSmPrefix = "b,p,m,f,d,t,n,l,g,k,h,j,q,x,zh,ch,sh,r,z,c,s,y,w"
-            .split(",");
-    private static final String[] SMs = ",b,p,m,f,d,t,n,l,g,k,h,j,q,x,z,c,s,zh,ch,sh,r"
-            .split(",");
-    private static final String[] YMs = "a,ai,an,ang,ao,e,ei,en,eng,er,i,ia,ian,iang,iao,ie,in,ing,io,iong,iou,o,ong,ou,u,ua,uai,uan,uang,ue,uei,uen,ueng,uo,uong,v,van,ve,ven,I,E,m,n,ng"
-            .split(",");
+    private static final String[] sSmPrefix = "b,p,m,f,d,t,n,l,g,k,h,j,q,x,zh,ch,sh,r,z,c,s,y,w".split(",");
+    private static final String[] SMs = ",b,p,m,f,d,t,n,l,g,k,h,j,q,x,z,c,s,zh,ch,sh,r".split(",");
+    private static final String[] YMs = "a,ai,an,ang,ao,e,ei,en,eng,er,i,ia,ian,iang,iao,ie,in,ing,io,iong,iou,o,ong,ou,u,ua,uai,uan,uang,ue,uei,uen,ueng,uo,uong,v,van,ve,ven,I,E,m,n,ng".split(",");
     private static final int TONE_COUNT = 5;
 
     private static final Map<String, Byte> sSMtoIndex = new HashMap<String, Byte>() {
         private static final long serialVersionUID = 1L;
+
         {
             for (byte i = 0; i < SMs.length; ++i)
                 put(SMs[i], i);
@@ -42,6 +40,7 @@ public final class Pinyin {
     };
     private static final Map<String, Byte> sYMtoIndex = new HashMap<String, Byte>() {
         private static final long serialVersionUID = 1L;
+
         {
             for (byte i = 0; i < YMs.length; ++i)
                 put(YMs[i], i);
@@ -56,7 +55,13 @@ public final class Pinyin {
     private static final byte[][] sYmDistance = new byte[YMs.length][YMs.length];
     private static final byte[][] sToneDistance = new byte[TONE_COUNT][TONE_COUNT];
 
-    public static final void createModal(Storage storage) throws IOException {
+    /**
+     * [private] 从Unicode库创建拼音模型
+     *
+     * @param storage 提供Unihan_Readings.txt文件的存储
+     * @throws IOException Unihan_Readings.txt文件读取异常
+     */
+    public static final void createModal(final Storage storage) throws IOException {
         Logger.d(TAG, "==> createModal");
 
         try (final InputStream f = storage.open("Unihan_Readings.txt")) {
@@ -115,33 +120,29 @@ public final class Pinyin {
             sCharSmYmTone['V'] = sCharSmYmTone['v'] = _pinyinToSmYmTone("wei");
             sCharSmYmTone['Y'] = sCharSmYmTone['y'] = _pinyinToSmYmTone("wai");
 
-            BufferedReader r = new BufferedReader(new InputStreamReader(f,
-                    "UTF-8"));
+            final BufferedReader r = new BufferedReader(new InputStreamReader(f, "UTF-8"));
             for (; ; ) {
-                String l = r.readLine();
+                final String l = r.readLine();
                 if (l == null)
                     break;
                 if (l.startsWith("U+")) {
-                    String[] p = l.split("\t");
+                    final String[] p = l.split("\t");
                     if (p[1].equals("kMandarin")) {
-                        int u = Integer.parseInt(p[0].substring(2), 16);
+                        final int u = Integer.parseInt(p[0].substring(2), 16);
                         String pinyin = p[2];
                         int tone = 0;
                         // System.out.printf("%d: %s\n", u, pinyin);
                         for (int i = 0; i < 8 * 4; ++i) {
-                            char c = "āáǎàōóǒòēéěèīíǐìūúǔù_ǘǚǜ_ḿ___ńňǹ"
-                                    .charAt(i);
-                            int a = pinyin.indexOf(c);
+                            final char c = "āáǎàōóǒòēéěèīíǐìūúǔù_ǘǚǜ_ḿ___ńňǹ".charAt(i);
+                            final int a = pinyin.indexOf(c);
                             if (a >= 0) {
-                                pinyin = pinyin.substring(0, a)
-                                        + "aoeiuümn".charAt(i / 4)
-                                        + pinyin.substring(a + 1);
+                                pinyin = pinyin.substring(0, a) + "aoeiuümn".charAt(i / 4) + pinyin.substring(a + 1);
                                 tone = (i % 4) + 1;
                                 break;
                             }
                         }
                         pinyin = pinyin.replace('ü', 'v');
-                        short SmYmTone = _pinyinToSmYmTone(pinyin);
+                        final short SmYmTone = _pinyinToSmYmTone(pinyin);
                         if (u < sCharSmYmTone.length)
                             sCharSmYmTone[u] = (short) (SmYmTone | tone);
                     }
@@ -149,25 +150,20 @@ public final class Pinyin {
             }
 
             // for (int i = 0; i < PINYINs.length; ++i)
-            // System.out.printf("%s\t%s\t%s\n", PINYINs[i], SMs[sPinyin2SmYm[i]
-            // >> 16], YMs[sPinyin2SmYm[i] & 0x0000FFFF]);
+            // System.out.printf("%s\t%s\t%s\n", PINYINs[i], SMs[sPinyin2SmYm[i] >> 16], YMs[sPinyin2SmYm[i] & 0x0000FFFF]);
 
             for (int i = 0; i < SMs.length; ++i)
                 for (int j = 0; j < SMs.length; ++j)
                     if (i < j) {
                         if (SMs[i].isEmpty())
-                            sSmDistance[i][j] = SMs[j].isEmpty() ? SM_WEIGHT
-                                    : 0;
-                        else if (",z-zh,c-ch,s-sh,".contains(',' + SMs[i] + '-'
-                                + SMs[j] + ','))
+                            sSmDistance[i][j] = SMs[j].isEmpty() ? SM_WEIGHT : 0;
+                        else if (",z-zh,c-ch,s-sh,".contains(',' + SMs[i] + '-' + SMs[j] + ','))
                             sSmDistance[i][j] = (byte) (SM_WEIGHT * .9);
-                        else if (",b-p,f-h,d-t,n-l,g-k,j-z,j-zh,q-c,q-ch,x-s,x-sh,"
-                                .contains(',' + SMs[i] + '-' + SMs[j] + ','))
+                        else if (",b-p,f-h,d-t,n-l,g-k,j-z,j-zh,q-c,q-ch,x-s,x-sh,".contains(',' + SMs[i] + '-' + SMs[j] + ','))
                             sSmDistance[i][j] = (byte) (SM_WEIGHT * .8);
                         else
                             sSmDistance[i][j] = 0;
-                        // System.out.printf("%s-%s: %d\n", SMs[i], SMs[j],
-                        // sSmDistance[i][j]);
+                        // System.out.printf("%s-%s: %d\n", SMs[i], SMs[j], sSmDistance[i][j]);
                     } else if (i == j)
                         sSmDistance[i][j] = SM_WEIGHT;
                     else
@@ -181,10 +177,8 @@ public final class Pinyin {
                         else if (YMs[j].equals(YMs[i] + 'g'))
                             sYmDistance[i][j] = (byte) (YM_WEIGHT * .9);
                         else
-                            sYmDistance[i][j] = (byte) (YM_WEIGHT * _compareText(
-                                    YMs[i], YMs[j]));
-                        // System.out.printf("%s-%s: %d\n", YMs[i], YMs[j],
-                        // sYmDistance[i][j]);
+                            sYmDistance[i][j] = (byte) (YM_WEIGHT * _compareText(YMs[i], YMs[j]));
+                        // System.out.printf("%s-%s: %d\n", YMs[i], YMs[j], sYmDistance[i][j]);
                     } else if (i == j)
                         sYmDistance[i][j] = YM_WEIGHT;
                     else
@@ -199,8 +193,7 @@ public final class Pinyin {
                             sToneDistance[i][j] = (byte) (TONE_WEIGHT * .5);
                         else
                             sToneDistance[i][j] = 0;
-                        // System.out.printf("%d-%d: %d\n", i, j,
-                        // sToneDistance[i][j]);
+                        // System.out.printf("%d-%d: %d\n", i, j, sToneDistance[i][j]);
                     } else if (i == j)
                         sToneDistance[i][j] = TONE_WEIGHT;
                     else
@@ -211,13 +204,19 @@ public final class Pinyin {
         }
     }
 
-    public static final void saveModal(Storage storage) throws IOException {
+    /**
+     * [private] 保存拼音模型
+     *
+     * @param storage 保存拼音模型的存储
+     * @throws IOException 写拼音模型文件异常
+     */
+    public static final void saveModal(final Storage storage) throws IOException {
         Logger.d(TAG, "==> saveModal");
         try {
             if (storage.exists(MODAL_FILE))
                 throw new IOException(MODAL_FILE + " existed");
-            try (final OutputStream f = storage.create(MODAL_FILE)) {
-                DataOutputStream out = new DataOutputStream(f);
+            try (final OutputStream f = storage.create(MODAL_FILE);
+                 final DataOutputStream out = new DataOutputStream(f)) {
                 out.write(sNormalizedSMs);
                 out.write(sNormalizedYMs);
                 for (int i = 0; i < sCharSmYmTone.length; ++i)
@@ -234,7 +233,7 @@ public final class Pinyin {
         }
     }
 
-    private static final void _loadModal(Storage storage) throws IOException {
+    private static final void _loadModal(final Storage storage) throws IOException {
         Logger.d(TAG, "==> loadModal");
         try (final InputStream f = storage.open(MODAL_FILE);
              final DataInputStream in = new DataInputStream(f)) {
@@ -253,16 +252,19 @@ public final class Pinyin {
         }
     }
 
+    /**
+     * 初始化拼音模块
+     */
     public static final void init() {
         try {
             _loadModal(new JarStorage(Pinyin.class.getClassLoader()));
-        } catch (IOException e) {
+        } catch (final IOException e) {
             e.printStackTrace();
             throw new RuntimeException(e);
         }
     }
 
-    private static final short _pinyinToSmYmTone(String pinyin) {
+    private static final short _pinyinToSmYmTone(final String pinyin) {
         String sm = "", ym;
         int tone = pinyin.charAt(pinyin.length() - 1);
         if (Character.isDigit(tone)) {
@@ -302,14 +304,14 @@ public final class Pinyin {
     }
 
     // 计算字符串相似度
-    private static final double _compareText(String str1, String str2) {
-        int n = str1.length(), m = str2.length();
+    private static final double _compareText(final String str1, final String str2) {
+        final int n = str1.length(), m = str2.length();
         if (n == 0)
             return m;
         if (m == 0)
             return n;
 
-        int[][] Matrix = new int[n + 1][m + 1];
+        final int[][] Matrix = new int[n + 1][m + 1];
 
         // 初始化第一列
         for (int i = 0; i <= n; i++)
@@ -320,13 +322,11 @@ public final class Pinyin {
             Matrix[0][j] = j;
 
         for (int i = 1; i <= n; i++) {
-            char ch1 = str1.charAt(i - 1);
+            final char ch1 = str1.charAt(i - 1);
             for (int j = 1; j <= m; j++) {
-                char ch2 = str2.charAt(j - 1);
-                int temp = ch1 == ch2 ? 0 : 1;
-                Matrix[i][j] = Math.min(
-                        Math.min(Matrix[i - 1][j] + 1, Matrix[i][j - 1] + 1),
-                        Matrix[i - 1][j - 1] + temp);
+                final char ch2 = str2.charAt(j - 1);
+                final int temp = ch1 == ch2 ? 0 : 1;
+                Matrix[i][j] = Math.min(Math.min(Matrix[i - 1][j] + 1, Matrix[i][j - 1] + 1), Matrix[i - 1][j - 1] + temp);
             }
         }
 
@@ -339,7 +339,14 @@ public final class Pinyin {
         return 1. - (double) Matrix[n][m] / Math.max(m, n);
     }
 
-    public static final double compareChar(char c1, char c2) {
+    /**
+     * [private] 比较字符
+     *
+     * @param c1 字符1
+     * @param c2 字符2
+     * @return 相似度，满分为1.0
+     */
+    public static final double compareChar(final char c1, final char c2) {
         if (c1 == c2)
             return 1;
 
@@ -349,24 +356,29 @@ public final class Pinyin {
         short SmYmTone = sCharSmYmTone[c1];
         if (SmYmTone < 0)
             return 0;
-        int sm1 = SmYmTone >> 10;
-        int ym1 = (SmYmTone >> 4) & 0x003F;
-        int tone1 = SmYmTone & 0x000F;
+        final int sm1 = SmYmTone >> 10;
+        final int ym1 = (SmYmTone >> 4) & 0x003F;
+        final int tone1 = SmYmTone & 0x000F;
 
         SmYmTone = sCharSmYmTone[c2];
         if (SmYmTone < 0)
             return 0;
-        int sm2 = SmYmTone >> 10;
-        int ym2 = (SmYmTone >> 4) & 0x003F;
-        int tone2 = SmYmTone & 0x000F;
+        final int sm2 = SmYmTone >> 10;
+        final int ym2 = (SmYmTone >> 4) & 0x003F;
+        final int tone2 = SmYmTone & 0x000F;
 
-        return (double) (sSmDistance[sm1][sm2] + sYmDistance[ym1][ym2] + sToneDistance[tone1][tone2])
-                / TOTAL_WEIGHT;
+        return (double) (sSmDistance[sm1][sm2] + sYmDistance[ym1][ym2] + sToneDistance[tone1][tone2]) / TOTAL_WEIGHT;
     }
 
-    public static final short normailizeChar(char c) {
+    /**
+     * [private] 获取聚类字符
+     *
+     * @param c 原字符
+     * @return 聚类字符
+     */
+    public static final short normailizeChar(final char c) {
         // System.out.printf("c=%c\n", c);
-        short SmYmTone = sCharSmYmTone[c];
+        final short SmYmTone = sCharSmYmTone[c];
         if (SmYmTone < 0)
             return -1;
         int sm = SmYmTone >> 10;
@@ -383,11 +395,23 @@ public final class Pinyin {
         return (short) ((sm << 10) | (ym << 4));
     }
 
-    public static final int getSM(short normChar) {
+    /**
+     * [private] 获取聚类字符的声母
+     *
+     * @param normChar 聚类字符
+     * @return 声母
+     */
+    public static final int getSM(final short normChar) {
         return normChar >> 10;
     }
 
-    public static final int getYM(short normChar) {
+    /**
+     * [private] 获取聚类字符的韵母
+     *
+     * @param normChar 聚类字符
+     * @return 韵母
+     */
+    public static final int getYM(final short normChar) {
         return (normChar >> 4) & 0x3F;
     }
 }

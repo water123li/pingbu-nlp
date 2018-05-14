@@ -14,12 +14,12 @@ import pingbu.common.Logger;
 import pingbu.common.Storage;
 
 /**
- * Class for loading lexicon or grammar from stream such as file
+ * NLP词典和语法加载器
  * 
  * @author pingbu
  */
-public abstract class NlpFile {
-    private static final String TAG = NlpFile.class.getSimpleName();
+public abstract class NlpLoader {
+    private static final String TAG = NlpLoader.class.getSimpleName();
     private static final boolean LOG = true;
 
     private static final void log(final String fmt, final Object... args) {
@@ -27,8 +27,15 @@ public abstract class NlpFile {
             Logger.d(TAG, String.format(fmt, args));
     }
 
-    public static Lexicon loadLexicon(final String name, final boolean fuzzy,
-            final String path) {
+    /**
+     * 从文本文件加载词典
+     *
+     * @param name  词典名
+     * @param fuzzy 是否模糊匹配
+     * @param path  文本文件路径
+     * @return 词典对象
+     */
+    public static Lexicon loadLexicon(final String name, final boolean fuzzy, final String path) {
         try (final FileInputStream f = new FileInputStream(path)) {
             return loadLexicon(name, fuzzy, f);
         } catch (final IOException e) {
@@ -37,8 +44,16 @@ public abstract class NlpFile {
         }
     }
 
-    public static Lexicon loadLexicon(final String name, final boolean fuzzy,
-            final Storage storage, final String fileName) {
+    /**
+     * 从文本文件加载词典
+     *
+     * @param name     词典名
+     * @param fuzzy    是否模糊匹配
+     * @param storage  文本文件存储
+     * @param fileName 文本文件名
+     * @return 词典对象
+     */
+    public static Lexicon loadLexicon(final String name, final boolean fuzzy, final Storage storage, final String fileName) {
         try (final InputStream in = storage.open(fileName)) {
             return loadLexicon(name, fuzzy, in);
         } catch (final IOException e) {
@@ -47,13 +62,11 @@ public abstract class NlpFile {
         }
     }
 
-    public static Lexicon loadLexicon(final String name, final boolean fuzzy,
-            final InputStream in) {
+    private static Lexicon loadLexicon(final String name, final boolean fuzzy, final InputStream in) {
         try {
-            final BufferedReader r = new BufferedReader(new InputStreamReader(
-                    in, "UTF-8"));
+            final BufferedReader r = new BufferedReader(new InputStreamReader(in, "UTF-8"));
             final LexiconSimple1 lexicon = new LexiconSimple1(name, fuzzy);
-            for (;;) {
+            for (; ; ) {
                 final String l = r.readLine();
                 if (l == null)
                     break;
@@ -416,7 +429,7 @@ public abstract class NlpFile {
                 try {
                     final BufferedReader in = new BufferedReader(
                             new InputStreamReader(s, "UTF-8"));
-                    for (;; ++line) {
+                    for (; ; ++line) {
                         final String l = in.readLine();
                         if (l == null)
                             break;
@@ -449,9 +462,10 @@ public abstract class NlpFile {
     }
 
     /**
-     * Load a new grammar from description file.
-     * @param path Path of the grammar description file to be loaded.
-     * @return New grammar loaded from description file.
+     * 从文件加载语法
+     *
+     * @param path 语法描述文件路径
+     * @return 语法对象
      */
     public static Grammar loadGrammar(final String path) {
         final String fullPath = new File(path).getAbsolutePath();
@@ -460,8 +474,14 @@ public abstract class NlpFile {
         return loadGrammar(storage, fullPath.substring(p));
     }
 
-    public static Grammar loadGrammar(final Storage storage,
-            final String fileName) {
+    /**
+     * 从文件加载语法
+     *
+     * @param storage  语法描述文件存储
+     * @param fileName 语法描述文件名
+     * @return 语法对象
+     */
+    public static Grammar loadGrammar(final Storage storage, final String fileName) {
         try (final InputStream s = storage.open(fileName)) {
             final GrammarAnalyzer grammarAnalyzer = new GrammarAnalyzer(storage);
             grammarAnalyzer.load(s);

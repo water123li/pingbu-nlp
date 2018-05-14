@@ -3,16 +3,15 @@ package pingbu.search;
 import java.util.ArrayList;
 import java.util.List;
 
-public class IndexDatabase implements Index {
+class SqlIndex implements SearchIndex {
 
     private static void __appendValue(final StringBuilder s, String value,
-            String format) {
+                                      String format) {
         if (format == null || format.equalsIgnoreCase("String")) {
             s.append('\"');
             s.append(value.replace("\"", "\"\""));
             s.append('\"');
-        } else if (format.equalsIgnoreCase("Bool")
-                || format.equalsIgnoreCase("Boolean")) {
+        } else if (format.equalsIgnoreCase("Bool") || format.equalsIgnoreCase("Boolean")) {
             s.append(Boolean.parseBoolean(value) ? "1" : "0");
         } else {
             s.append(value);
@@ -22,7 +21,7 @@ public class IndexDatabase implements Index {
     private static String __formatSQL(String fmt, String value) {
         final String[] values = value.split(",");
         final StringBuilder sql = new StringBuilder();
-        for (int p = 0;;) {
+        for (int p = 0; ; ) {
             final int a = fmt.indexOf('{', p) + 1;
             if (a <= 0) {
                 sql.append(fmt.substring(p));
@@ -37,9 +36,7 @@ public class IndexDatabase implements Index {
             if (q < 0)
                 __appendValue(sql, values[Integer.parseInt(slot)], null);
             else
-                __appendValue(sql,
-                        values[Integer.parseInt(slot.substring(0, q))],
-                        slot.substring(q + 1));
+                __appendValue(sql, values[Integer.parseInt(slot.substring(0, q))], slot.substring(q + 1));
             p = b + 1;
         }
         return sql.toString();
@@ -47,7 +44,7 @@ public class IndexDatabase implements Index {
 
     private final String mConnStr, mSqlFmt;
 
-    public IndexDatabase(String connStr, String sqlFmt) {
+    public SqlIndex(final String connStr, final String sqlFmt) {
         mConnStr = connStr;
         mSqlFmt = sqlFmt;
     }
@@ -61,11 +58,10 @@ public class IndexDatabase implements Index {
     public Iterator iterate(final String value) {
         final String[] values = value.split("\\|");
         if (values.length == 1)
-            return new DatabaseIterator(mConnStr, __formatSQL(mSqlFmt, value));
+            return new SqlIterator(mConnStr, __formatSQL(mSqlFmt, value));
         final List<Iterator> iterators = new ArrayList<Iterator>();
         for (String v : values)
-            iterators.add(new DatabaseIterator(mConnStr,
-                    __formatSQL(mSqlFmt, v)));
+            iterators.add(new SqlIterator(mConnStr, __formatSQL(mSqlFmt, v)));
         return new MultiIterator(iterators);
     }
 }

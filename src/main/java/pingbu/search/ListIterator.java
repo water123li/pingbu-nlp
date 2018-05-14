@@ -2,7 +2,7 @@ package pingbu.search;
 
 import java.util.List;
 
-public class ListIterator implements Index.Iterator {
+class ListIterator implements SearchIndex.Iterator {
     private final List<Integer> mIds;
     private int mPos = 0;
 
@@ -18,7 +18,7 @@ public class ListIterator implements Index.Iterator {
     }
 
     @Override
-    public double sumupToItem(final int id) {
+    public double sumUpToItem(final int id) {
         if (getNextItem() == id) {
             ++mPos;
             return 1;
@@ -27,6 +27,6 @@ public class ListIterator implements Index.Iterator {
     }
 
     @Override
-    public void close() throws Exception {
+    public void close() {
     }
 }

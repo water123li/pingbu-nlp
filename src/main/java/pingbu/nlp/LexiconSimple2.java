@@ -14,7 +14,7 @@ import pingbu.common.Pinyin;
  * 
  * @author pingbu
  */
-public class LexiconSimple2 extends LexiconSimple {
+class LexiconSimple2 extends LexiconSimple {
     private static final String TAG = LexiconSimple2.class.getSimpleName();
 
     private static final boolean LOG = false;

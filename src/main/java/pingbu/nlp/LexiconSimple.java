@@ -5,7 +5,7 @@ package pingbu.nlp;
  * 
  * @author pingbu
  */
-public abstract class LexiconSimple extends Lexicon {
+abstract class LexiconSimple extends Lexicon {
 
     public LexiconSimple(String name) {
         super(name);

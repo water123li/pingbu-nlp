@@ -8,8 +8,8 @@ import java.sql.Statement;
 
 import pingbu.common.Logger;
 
-public class DatabaseIterator implements Index.Iterator {
-    private static final String TAG = DatabaseIterator.class.getSimpleName();
+class SqlIterator implements SearchIndex.Iterator {
+    private static final String TAG = SqlIterator.class.getSimpleName();
 
     private final Connection mConnection;
     private final Statement mStatement;
@@ -27,7 +27,7 @@ public class DatabaseIterator implements Index.Iterator {
         }
     }
 
-    public DatabaseIterator(final String connStr, final String sql) {
+    public SqlIterator(final String connStr, final String sql) {
         Logger.d(TAG, sql);
         Connection conn = null;
         Statement st = null;
@@ -51,7 +51,7 @@ public class DatabaseIterator implements Index.Iterator {
     }
 
     @Override
-    public double sumupToItem(final int id) {
+    public double sumUpToItem(final int id) {
         if (getNextItem() == id) {
             __cacheNext();
             return 1;

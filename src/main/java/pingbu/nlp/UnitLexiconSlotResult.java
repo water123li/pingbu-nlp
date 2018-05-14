@@ -1,6 +1,6 @@
 package pingbu.nlp;
 
-public class UnitLexiconSlotResult extends UnitLexiconSlot implements
+class UnitLexiconSlotResult extends UnitLexiconSlot implements
         Unit.Result {
 
     private final String mSourceText;

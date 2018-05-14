@@ -1,6 +1,6 @@
 package pingbu.nlp;
 
-public class UnitLexiconSlot implements Unit {
+class UnitLexiconSlot implements Unit {
 
     protected final Lexicon mLexicon;
     private final String mId;

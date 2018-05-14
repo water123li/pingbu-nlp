@@ -7,9 +7,17 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+/**
+ * 文件系统存储类
+ */
 public class FileStorage implements Storage {
     private final String mRoot;
 
+    /**
+     * 初始化文件系统存储类
+     *
+     * @param root 文件存储根目录
+     */
     public FileStorage(final String root) {
         if (root.endsWith(File.separator))
             mRoot = root;

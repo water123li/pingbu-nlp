@@ -32,12 +32,12 @@ public final class Grammar {
             Logger.d(TAG, String.format(fmt, args));
     }
 
-    public static final class ItemSlot {
+    protected static final class ItemSlot {
         public String name;
         public int pos, length;
     }
 
-    public static final class ItemParam {
+    protected static final class ItemParam {
         public String key, value;
     }
 
@@ -49,9 +49,24 @@ public final class Grammar {
         mLexicons = new ArrayList<Lexicon>(lexicons);
     }
 
+    /**
+     * 语法搜索结果
+     */
     public static final class SearchResult {
+        /**
+         * 语法参数
+         */
         public final Map<String, String> params;
-        public final double score, time;
+
+        /**
+         * 语法得分，满分1.0
+         */
+        public final double score;
+
+        /**
+         * 语法搜索时间，单位秒
+         */
+        public final double time;
 
         private SearchResult(Map<String, String> params, double score,
                 double time) {
@@ -379,6 +394,11 @@ public final class Grammar {
         private static final long serialVersionUID = 1L;
     }
 
+    /**
+     * 搜索语法
+     * @param text 待搜索的输入文本
+     * @return 搜索结果
+     */
     public final SearchResult search(String text) {
         log_result("*** Searching for %s:", text);
         SearchContext searchContext = new SearchContext(text);
