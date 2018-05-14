@@ -1,8 +1,0 @@
-#=========================
-# grammar file for others
-#-------------------------
-
-define("[<$Prefix>][打开]翻译", "action=translate");
-define("[<$Prefix>](网购|[上网](购物|买东西|买买买))", "action=merchandise");
-define("[[<$Prefix>]交][手机|[电]话|水|电|[煤|液化|天然]气|[宽带]([上]网|网络)|[有线]电视|收视]费", "action=charge");
-define("[<$Prefix>](上网[冲浪]|(打开|浏览|看)网页)", "action=website");

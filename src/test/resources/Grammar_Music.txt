@@ -1,0 +1,8 @@
+#========================
+# grammar file for music
+#------------------------
+
+Music = define("<MusicName>|<Artist>(的|嘅)(歌[曲]|音乐)[<MusicName>]|<MusicType>");
+
+define("[[<$Prefix>](听|播|放|播放|打开)](歌[曲]|音乐|<Music>)", "action=music");
+define("[<$Prefix>](唱K|([演]唱|K)(歌[曲]|<Music>))", "action=ktv");

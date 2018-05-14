@@ -1,0 +1,26 @@
+#======================
+# grammar file example
+#----------------------
+
+# define common prefix
+$Prefix = compile("[麻烦[你]]([请](帮|给|为)我)|我(想|要|想要)");
+
+# define slots about date and time
+Year = compile("(<Digit:1800-2099>|前|去|旧|今|明|后)年[度|代]");
+$Month = compile("<Digit:1-12>月[份]|(上上|上|这|下|下下)[个]月|本月");
+Month = define("[<Year>[的]]<$Month>");
+Week = compile("(上上|上|这|下|下下)([个]星期|周)");
+$Date = compile("<Digit:1-31>[日|号]|(前|昨|今|明|后)[日|天|朝]|[(上上|上|这|下|下下)[个]](星期|周)(一|二|三|四|五|六|日|天)");
+Date = define("[<Month>[的]]<$Date>");
+$DateRange = define("<Year>|<Month>|<Week>|<Date>");
+$Time = compile("[<Digit:0-23>(点|时)[整|半|一刻|差一刻|<Digit:1-59>分|多][钟]]");
+Time = define("[凌晨|清晨|晨|早|早上|上午|中午|午后|下午|黄昏|傍晚|晚|晚上|夜|夜里|深夜|午夜|半夜|下半夜|后半夜]<$Time>");
+$DateTime = define("<Date>|[<Date>[的]]<Time>");
+
+# include grammars
+include("Grammar_Video.txt");
+include("Grammar_TV.txt");
+include("Grammar_Music.txt");
+include("Grammar_Weather.txt");
+include("Grammar_Stock.txt");
+include("Grammar_Others.txt");
