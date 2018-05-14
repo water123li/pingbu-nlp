@@ -59,9 +59,9 @@ public abstract class SearchLoader {
      * 从CSV表格文件加载搜索库
      *
      * @param path CSV表格文件路径
-     * @return 搜索库
+     * @return 包含条目数据的搜索库
      */
-    public static SearchLibrary loadSearchLibraryFromCSV(final String path) {
+    public static SearchLibraryWithData loadSearchLibraryFromCSV(final String path) {
         final String fullPath = new File(path).getAbsolutePath();
         final int p = fullPath.lastIndexOf(File.separatorChar) + 1;
         final Storage storage = new FileStorage(fullPath.substring(0, p));
@@ -73,14 +73,13 @@ public abstract class SearchLoader {
      *
      * @param storage  CSV表格文件所在存储
      * @param fileName CSV表格文件名
-     * @return 搜索库
+     * @return 包含条目数据的搜索库
      */
-    public static SearchLibrary loadSearchLibraryFromCSV(final Storage storage, final String fileName) {
+    public static SearchLibraryWithData loadSearchLibraryFromCSV(final Storage storage, final String fileName) {
         try (final InputStream s = storage.open(fileName)) {
             final BufferedReader in = new BufferedReader(new InputStreamReader(s, "UTF-8"));
-            final SearchLibrary search = new SearchLibrary();
+            final SearchLibraryWithData library = new SearchLibraryWithData();
             final String[] fields;
-            final Map<String, SearchIndex> fieldIndexes = new HashMap<>();
             {
                 String l = in.readLine();
                 if (l.startsWith(BOM))
@@ -100,8 +99,7 @@ public abstract class SearchLoader {
                         fieldIndex = null;
                     if (fieldIndex != null) {
                         fields[i] = name;
-                        search.addField(name, fieldIndex);
-                        fieldIndexes.put(name, fieldIndex);
+                        library.addField(name, fieldIndex);
                     }
                 }
             }
@@ -109,15 +107,17 @@ public abstract class SearchLoader {
                 final String l = in.readLine();
                 if (l == null)
                     break;
+                final Map<String, String> item = new HashMap<>();
                 final String[] values = l.split(",");
                 for (int i = 0; i < fields.length && i < values.length; ++i) {
                     String value = values[i];
                     if (value.startsWith("\"") && value.endsWith("\""))
                         value = value.substring(1, value.length() - 1).replace("\\\"", "\"").replace("\\\\", "\\");
-                    fieldIndexes.get(fields[i]).addItem(id, value);
+                    item.put(fields[i], value);
                 }
+                library.addItem(id, item);
             }
-            return search;
+            return library;
         } catch (final IOException e) {
             e.printStackTrace();
             return null;

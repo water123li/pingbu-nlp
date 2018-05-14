@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class TestSearch {
+public class TestSearchDB {
 
     private static final String CONN_STRING = "jdbc:sqlite:test_data/Video.db";
 

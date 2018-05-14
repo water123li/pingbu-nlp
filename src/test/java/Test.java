@@ -6,6 +6,7 @@ public class Test {
         // Logger.setLogger(new ConsoleLogger(true));
         Pinyin.init();
         TestNlp.test();
-        TestSearch.test();
+        TestSearchCSV.test();
+        TestSearchDB.test();
     }
 }

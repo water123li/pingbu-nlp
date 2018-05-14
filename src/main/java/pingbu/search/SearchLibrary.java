@@ -25,6 +25,10 @@ public class SearchLibrary {
         mIndexes.put(name, index);
     }
 
+    protected SearchIndex getField(final String name) {
+        return mIndexes.get(name);
+    }
+
     /**
      * 添加一个索引条目
      *
