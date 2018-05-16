@@ -4,6 +4,4 @@
 - 基于汉语读音的模糊匹配；
 - 模糊搜索匹配。
 
-完整的测试数据需要另外从百度云盘下载。
-
-下载地址：https://pan.baidu.com/s/1m1PXuGbnzkQqwkRljCvkGA
+版本1.0已在Maven中央仓库发布，坐标`com.github.pingbu:pingbu-nlp-1.0`

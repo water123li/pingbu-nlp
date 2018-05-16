@@ -1,12 +1,12 @@
 package pingbu.nlp;
 
-import pingbu.common.Pinyin;
+import pingbu.pinyin.Pinyin;
 
 class UnitChar implements Unit {
 
-    protected final char mChar;
+    final char mChar;
 
-    public UnitChar(char c) {
+    UnitChar(char c) {
         mChar = c;
     }
 

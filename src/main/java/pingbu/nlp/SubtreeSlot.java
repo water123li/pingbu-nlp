@@ -47,7 +47,7 @@ class SubtreeSlot extends Subtree {
     }
 
     @Override
-    public Subtree.Cursor newCursor(Cursor returnCursor) {
+    public Cursor newCursor(Cursor returnCursor) {
         return new EnterCursor(returnCursor);
     }
 }

@@ -5,7 +5,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import pingbu.common.Logger;
+import pingbu.logger.Logger;
 
 /**
  * 语法解析模块，用于解析语法描述，生成语法树或词典
@@ -17,27 +17,27 @@ public final class Parser {
     private static final boolean LOG = false;
     private static final boolean LOG_ITEM = false;
 
-    private static final void log(String fmt, Object... args) {
+    private static void log(String fmt, Object... args) {
         if (LOG)
-            Logger.d(TAG, String.format(fmt, args));
+            Logger.d(TAG, fmt, args);
     }
 
-    private static final void log_item(String fmt, Object... args) {
+    private static void log_item(String fmt, Object... args) {
         if (LOG_ITEM)
-            Logger.d(TAG, String.format(fmt, args));
+            Logger.d(TAG, fmt, args);
     }
 
-    private final Map<String, Subtree> mSlots = new HashMap<String, Subtree>();
-    private final Map<String, Lexicon> mLexicons = new HashMap<String, Lexicon>();
+    private final Map<String, Subtree> mSlots = new HashMap<>();
+    private final Map<String, Lexicon> mLexicons = new HashMap<>();
 
     private final SubtreeOr mCommands = new SubtreeOr();
 
-    private static final ArrayList<Grammar.ItemParam> _parseParams(String desc) {
-        ArrayList<Grammar.ItemParam> params = new ArrayList<Grammar.ItemParam>();
+    private static ArrayList<Grammar.ItemParam> _parseParams(String desc) {
+        final ArrayList<Grammar.ItemParam> params = new ArrayList<>();
         if (desc != null)
             for (String item : desc.split(",")) {
-                Grammar.ItemParam param = new Grammar.ItemParam();
-                int p = item.indexOf('=');
+                final Grammar.ItemParam param = new Grammar.ItemParam();
+                final int p = item.indexOf('=');
                 if (p > 0) {
                     param.key = item.substring(0, p);
                     param.value = item.substring(p + 1);
@@ -55,21 +55,20 @@ public final class Parser {
         private final Collection<Grammar.ItemParam> mParams;
         private int mPosition;
 
-        public _Parser(String desc, String params) {
+        _Parser(String desc, String params) {
             mDesc = desc;
             mParams = _parseParams(params);
             mPosition = 0;
         }
 
-        public final Subtree parse() {
+        final Subtree parse() {
             SubtreeOr orSubtree = null;
             SubtreeAnd andSubtree = null;
             SubtreeLinear linearSubtree = new SubtreeLinear();
             while (mPosition < mDesc.length()) {
                 char c = mDesc.charAt(mPosition++);
                 if (c == '(' || c == '[') {
-                    linearSubtree.addSubtree(c == '[' ? new SubtreeOptional(
-                            parse()) : parse());
+                    linearSubtree.addSubtree(c == '[' ? new SubtreeOptional(parse()) : parse());
                 } else if (c == ')' || c == ']') {
                     break;
                 } else if (c == '<') {
@@ -107,7 +106,7 @@ public final class Parser {
             return subtree;
         }
 
-        private final Subtree parseSlot() {
+        private Subtree parseSlot() {
             int a, b;
             a = b = mPosition;
             while (mDesc.charAt(b) != '>')
@@ -118,9 +117,7 @@ public final class Parser {
                 if (slot.startsWith("Digit:")) {
                     try {
                         final int p = slot.indexOf('-', 6);
-                        final Lexicon lexicon = new LexiconDigit(slot,
-                                Integer.parseInt(slot.substring(6, p)),
-                                Integer.parseInt(slot.substring(p + 1)));
+                        final Lexicon lexicon = new LexiconDigit(slot, Integer.parseInt(slot.substring(6, p)), Integer.parseInt(slot.substring(p + 1)));
                         addSlot(slot, lexicon);
                     } catch (Exception e) {
                         Logger.e(TAG, "slot <" + slot + "> invalid");
@@ -138,9 +135,7 @@ public final class Parser {
 
     public final void addCompiledSlot(String name, String desc) {
         log("==> addCompiledSlot %s <-- %s", name, desc);
-        addSlot(name,
-                __compileLexicon(name, 0, new _Parser(desc, null).parse()),
-                null);
+        addSlot(name, __compileLexicon(name, 0, new _Parser(desc, null).parse()), null);
         log("<== addCompiledSlot %s", name);
     }
 
@@ -179,10 +174,10 @@ public final class Parser {
         log("<== addCommand");
     }
 
-    // ////////////////////////////////
-    // / COMPILE LEXICON
+    //////////////////////////////////
+    /// COMPILE LEXICON
 
-    private static final String pathToString(Iterable<?> path) {
+    private static String pathToString(Iterable<?> path) {
         StringBuilder sb = new StringBuilder();
         for (Object unit : path)
             sb.append(unit.toString());
@@ -191,11 +186,11 @@ public final class Parser {
 
     private final class LexiconNavigator implements Subtree.Cursor.Navigator {
         private final LexiconSimple mLexicon;
-        private final ArrayList<Unit> mPath = new ArrayList<Unit>();
-        private final ArrayList<Grammar.ItemSlot> mSlots = new ArrayList<Grammar.ItemSlot>();
-        private final ArrayList<Grammar.ItemParam> mParams = new ArrayList<Grammar.ItemParam>();
+        private final ArrayList<Unit> mPath = new ArrayList<>();
+        private final ArrayList<Grammar.ItemSlot> mSlots = new ArrayList<>();
+        private final ArrayList<Grammar.ItemParam> mParams = new ArrayList<>();
 
-        public LexiconNavigator(LexiconSimple lexicon) {
+        LexiconNavigator(LexiconSimple lexicon) {
             mLexicon = lexicon;
         }
 
@@ -258,32 +253,31 @@ public final class Parser {
         return __compileLexicon(name, type, mCommands);
     }
 
-    private final LexiconSimple __compileLexicon(String name, int type,
-            Subtree grammar) {
+    private LexiconSimple __compileLexicon(String name, int type, Subtree grammar) {
         log("==> compileLexicon %s", name);
         long t = System.currentTimeMillis();
-        LexiconSimple lexicon = type == 2 ? new LexiconSimple2(name)
-                : new LexiconSimple1(name, type == Lexicon.TYPE_FUZZY);
+        LexiconSimple lexicon = type == 2 ? new LexiconSimple2(name) : new LexiconSimple1(name, type == Lexicon.TYPE_FUZZY);
         grammar.newCursor(null).navigate(new LexiconNavigator(lexicon));
         t = System.currentTimeMillis() - t;
         log("<== compileLexicon %.3fs", t / 1000.);
         return lexicon;
     }
 
-    public static final LexiconSimple compileLexicon(String name, String desc) {
+    public static LexiconSimple compileLexicon(String name, String desc) {
         return compileLexicon(name, desc, 0);
     }
 
-    public static final LexiconSimple compileLexicon(String name, String desc,
-            int type) {
+    public static LexiconSimple compileLexicon(String name, String desc, int type) {
         Parser parser = new Parser();
         parser.addCommand(desc, null);
         return parser.compileLexicon(name, type);
     }
 
-    // ////////////////////////////////
-    // / COMPILE GRAMMAR
-
+    /**
+     * 编译语法
+     *
+     * @return 语法对象
+     */
     public final Grammar compileGrammar() {
         return new Grammar(mCommands, mLexicons.values());
     }

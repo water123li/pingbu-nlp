@@ -1,10 +1,10 @@
 package pingbu.nlp;
 
-import pingbu.common.Pinyin;
+import pingbu.pinyin.Pinyin;
 
 class UnitCharResult extends UnitChar implements Unit.Result {
 
-    public UnitCharResult(char c) {
+    UnitCharResult(final char c) {
         super(c);
     }
 
@@ -24,7 +24,7 @@ class UnitCharResult extends UnitChar implements Unit.Result {
     }
 
     @Override
-    public double compare(Unit unit) {
+    public double compare(final Unit unit) {
         if (unit instanceof UnitChar)
             return Pinyin.compareChar(mChar, ((UnitChar) unit).mChar);
         else

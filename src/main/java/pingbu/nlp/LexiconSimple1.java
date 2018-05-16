@@ -8,8 +8,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import pingbu.common.Logger;
-import pingbu.common.Pinyin;
+import pingbu.logger.Logger;
+import pingbu.pinyin.Pinyin;
 
 class LexiconSimple1 extends LexiconSimple {
     private static final String TAG = LexiconSimple1.class.getSimpleName();
@@ -17,18 +17,18 @@ class LexiconSimple1 extends LexiconSimple {
     private static final boolean LOG = false;
     private static final double THRESHOLD = .6;
 
-    private static final void log(String fmt, Object... args) {
+    private static void log(final String fmt, final Object... args) {
         if (LOG)
-            Logger.d(TAG, String.format(fmt, args));
+            Logger.d(TAG, fmt, args);
     }
 
-    private static final String normalize(final char a, final char b) {
+    private static String normalize(final char a, final char b) {
         return Pinyin.normailizeChar(a) + "-" + Pinyin.normailizeChar(b);
     }
 
     private static final class Item {
-        public final String text;
-        public final ArrayList<Grammar.ItemParam> params = new ArrayList<Grammar.ItemParam>();
+        final String text;
+        public final ArrayList<Grammar.ItemParam> params = new ArrayList<>();
 
         public Item(final String text, final String params) {
             this.text = text;
@@ -49,10 +49,10 @@ class LexiconSimple1 extends LexiconSimple {
     }
 
     private static final class MatchedItem {
-        public final int item;
-        public final char c1, c2;
+        final int item;
+        final char c1, c2;
 
-        public MatchedItem(final int item, final char c1, final char c2) {
+        MatchedItem(final int item, final char c1, final char c2) {
             this.item = item;
             this.c1 = c1;
             this.c2 = c2;
@@ -60,21 +60,20 @@ class LexiconSimple1 extends LexiconSimple {
     }
 
     private final static class SearchingIndex {
-        public final int pos;
-        public final List<MatchedItem> index;
+        final int pos;
+        final List<MatchedItem> index;
 
-        public SearchingIndex(final int pos, final List<MatchedItem> index) {
+        SearchingIndex(final int pos, final List<MatchedItem> index) {
             this.pos = pos;
             this.index = index;
         }
     }
 
     private final static class MatchedWord {
-        public final int pos;
-        public final double scoreL, scoreR, score;
+        final int pos;
+        final double scoreL, scoreR, score;
 
-        public MatchedWord(final int pos, final double scoreL,
-                final double scoreR) {
+        MatchedWord(final int pos, final double scoreL, final double scoreR) {
             this.pos = pos;
             this.scoreL = scoreL;
             this.scoreR = scoreR;
@@ -83,24 +82,22 @@ class LexiconSimple1 extends LexiconSimple {
     }
 
     private final boolean mFuzzy;
-    private final List<Item> mItems = new ArrayList<Item>();
-    private final Map<String, Integer> mItemIndex = new HashMap<String, Integer>();
-    private final Map<Short, List<MatchedItem>> mCharIndex = new HashMap<Short, List<MatchedItem>>();
-    private final Map<String, List<MatchedItem>> mIndex = new HashMap<String, List<MatchedItem>>();
+    private final List<Item> mItems = new ArrayList<>();
+    private final Map<String, Integer> mItemIndex = new HashMap<>();
+    private final Map<Short, List<MatchedItem>> mCharIndex = new HashMap<>();
+    private final Map<String, List<MatchedItem>> mIndex = new HashMap<>();
 
     public LexiconSimple1(final String name, final boolean fuzzy) {
         super(name);
         mFuzzy = fuzzy;
     }
 
-    public LexiconSimple1(final String name, final boolean fuzzy,
-            final String[] items) {
+    public LexiconSimple1(final String name, final boolean fuzzy, final String[] items) {
         this(name, fuzzy);
         addItems(items);
     }
 
-    public LexiconSimple1(final String name, final boolean fuzzy,
-            final Iterable<String> items) {
+    public LexiconSimple1(final String name, final boolean fuzzy, final Iterable<String> items) {
         this(name, fuzzy);
         addItems(items);
     }
@@ -131,21 +128,19 @@ class LexiconSimple1 extends LexiconSimple {
             final short nc = Pinyin.normailizeChar(c);
             List<MatchedItem> index = mCharIndex.get(nc);
             if (index == null) {
-                index = new ArrayList<MatchedItem>();
+                index = new ArrayList<>();
                 mCharIndex.put(nc, index);
             }
             index.add(new MatchedItem(mItems.size() - 1, c, '\0'));
         } else
             for (int i = 1; i < text.length(); ++i) {
-                final String word = normalize(text.charAt(i - 1),
-                        text.charAt(i));
+                final String word = normalize(text.charAt(i - 1), text.charAt(i));
                 List<MatchedItem> index = mIndex.get(word);
                 if (index == null) {
-                    index = new ArrayList<MatchedItem>();
+                    index = new ArrayList<>();
                     mIndex.put(word, index);
                 }
-                index.add(new MatchedItem(mItems.size() - 1,
-                        text.charAt(i - 1), text.charAt(i)));
+                index.add(new MatchedItem(mItems.size() - 1, text.charAt(i - 1), text.charAt(i)));
             }
     }
 
@@ -160,24 +155,25 @@ class LexiconSimple1 extends LexiconSimple {
     }
 
     @Override
-    public final String getItemText(int id) {
+    public final String getItemText(final int id) {
         return mItems.get(id).text;
     }
 
     @Override
-    public final Collection<Grammar.ItemParam> getItemParams(int id) {
+    public final Collection<Grammar.ItemParam> getItemParams(final int id) {
         return mItems.get(id).params;
     }
 
     @Override
-    public final int findItem(String text) {
-        Integer id = mItemIndex.get(text);
+    public final int findItem(final String text) {
+        final Integer id = mItemIndex.get(text);
         return id == null ? -1 : id;
     }
 
     public final Collection<SearchResult> search(final String text) {
         log("Searching for %s in lexicon %s", text, name);
-        final Map<Integer, SearchResult> results = new HashMap<Integer, SearchResult>();
+        final Map<Integer, SearchResult> results = new HashMap<>();
+
         // 1. Generate single character matches for all position
         for (int i = 0; i < text.length(); ++i) {
             SearchResult r = null;
@@ -198,6 +194,7 @@ class LexiconSimple1 extends LexiconSimple {
                     }
                 }
         }
+
         // 2. Generate multiply-character matches for all position
         // 2.1 Prepare indexes of all dual-character words
         final List<SearchingIndex> wordIndexes = new ArrayList<SearchingIndex>();
@@ -206,6 +203,7 @@ class LexiconSimple1 extends LexiconSimple {
             final SearchingIndex index = new SearchingIndex(i, mIndex.get(word));
             wordIndexes.add(index);
         }
+
         // 2.2 Iterate all items matches these indexes
         final int[] wordIndexPos = new int[wordIndexes.size()];
         for (;;) {
@@ -221,23 +219,23 @@ class LexiconSimple1 extends LexiconSimple {
             }
             if (item >= Integer.MAX_VALUE)
                 break;
+
             // 2.2.2 Calculate scores for every index of current item
-            final List<MatchedWord> matchedWords = new ArrayList<MatchedWord>();
+            final List<MatchedWord> matchedWords = new ArrayList<>();
             for (int i = 0; i < wordIndexes.size(); ++i) {
                 final SearchingIndex index = wordIndexes.get(i);
-                while (index.index != null
-                        && wordIndexPos[i] < index.index.size()) {
+                while (index.index != null && wordIndexPos[i] < index.index.size()) {
                     final MatchedItem mi = index.index.get(wordIndexPos[i]);
                     if (mi.item > item)
                         break;
                     final MatchedWord w = new MatchedWord(index.pos,
-                            Pinyin.compareChar(mi.c1,
-                                    text.charAt(index.pos - 1)),
+                            Pinyin.compareChar(mi.c1, text.charAt(index.pos - 1)),
                             Pinyin.compareChar(mi.c2, text.charAt(index.pos)));
                     matchedWords.add(w);
                     ++wordIndexPos[i];
                 }
             }
+
             // 2.2.3 Sum up scores for every continuous section of current item
             Collections.sort(matchedWords, new Comparator<MatchedWord>() {
                 @Override
@@ -252,10 +250,8 @@ class LexiconSimple1 extends LexiconSimple {
                     double innerScore = 0;
                     for (int k = i; k <= j; ++k)
                         innerScore += matchedWords.get(k).score;
-                    final double score = (innerScore + matchedWords.get(i).scoreL
-                            * matchedWords.get(j).scoreR)
-                            / (mFuzzy ? length : Math.max(length,
-                                    mItems.get(item).text.length()));
+                    final double score = (innerScore + matchedWords.get(i).scoreL * matchedWords.get(j).scoreR)
+                            / (mFuzzy ? length : Math.max(length, mItems.get(item).text.length()));
                     if (score >= THRESHOLD) {
                         final int resultKey = (pos << 16) | length;
                         SearchResult r = results.get(resultKey);
@@ -272,10 +268,10 @@ class LexiconSimple1 extends LexiconSimple {
                 }
             }
         }
+
         // 3. Output results
         for (final SearchResult r : results.values())
-            log("%f %f - %s(%d,%d)", r.score, r.innerScore,
-                    getItemText(r.item), r.pos, r.length);
+            log("%f %f - %s(%d,%d)", r.score, r.innerScore, getItemText(r.item), r.pos, r.length);
         return results.values();
     }
 }
