@@ -95,12 +95,16 @@ public abstract class NlpLoader {
         boolean analyze(char c) throws GrammarAnalyzeException;
     }
 
+    private static boolean __isWhitespace(final char c) {
+        return c >= '\0' && c <= ' ';
+    }
+
     private static boolean __isTagHeadChar(final char c) {
-        return Character.isAlphabetic(c) || c == '_' || c == '$';
+        return c >= 'A' && c <= 'Z' || c >= 'a' && c <= 'z' || c == '_' || c == '$';
     }
 
     private static boolean __isTagChar(final char c) {
-        return __isTagHeadChar(c) || Character.isDigit(c) || c == '-' || c == '.';
+        return __isTagHeadChar(c) || c >= '0' && c <= '9' || c == '-' || c == '.';
     }
 
     private static final class GrammarAnalyzer {
@@ -138,7 +142,7 @@ public abstract class NlpLoader {
                 @Override
                 public boolean analyze(final char c)
                         throws GrammarAnalyzeException {
-                    if (Character.isWhitespace(c))
+                    if (__isWhitespace(c))
                         return true;
                     if (__isTagHeadChar(c)) {
                         mState = new StateTag(mNext);
@@ -192,7 +196,7 @@ public abstract class NlpLoader {
             private class StateAfterFunction extends StateAfterTag {
                 @Override
                 public boolean analyze(final char c) throws GrammarAnalyzeException {
-                    if (Character.isWhitespace(c))
+                    if (__isWhitespace(c))
                         return true;
                     if (c == '(') {
                         mFunction = mTag.toString();
@@ -210,7 +214,7 @@ public abstract class NlpLoader {
             private class StateBeforeArgument extends StateAfterTag {
                 @Override
                 public boolean analyze(final char c) throws GrammarAnalyzeException {
-                    if (Character.isWhitespace(c))
+                    if (__isWhitespace(c))
                         return true;
                     if (c == '"') {
                         mState = new StateString(new StateAfterArgument(
@@ -271,7 +275,7 @@ public abstract class NlpLoader {
 
                 @Override
                 public boolean analyze(final char c) throws GrammarAnalyzeException {
-                    if (Character.isWhitespace(c))
+                    if (__isWhitespace(c))
                         return true;
                     if (c == ',') {
                         __pushArg();
@@ -294,7 +298,7 @@ public abstract class NlpLoader {
             private class StateAfterLine extends StateAfterTag {
                 @Override
                 public boolean analyze(final char c) throws GrammarAnalyzeException {
-                    if (Character.isWhitespace(c))
+                    if (__isWhitespace(c))
                         return true;
                     if (c == ';') {
                         if (mLexicon != null) {
