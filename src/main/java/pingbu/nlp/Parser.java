@@ -256,11 +256,19 @@ public final class Parser {
     private LexiconSimple __compileLexicon(String name, int type, Subtree grammar) {
         log("==> compileLexicon %s", name);
         long t = System.currentTimeMillis();
-        LexiconSimple lexicon = type == 2 ? new LexiconSimple2(name) : new LexiconSimple1(name, type == Lexicon.TYPE_FUZZY);
+        LexiconSimple lexicon = createLexicon(name, type);
         grammar.newCursor(null).navigate(new LexiconNavigator(lexicon));
         t = System.currentTimeMillis() - t;
         log("<== compileLexicon %.3fs", t / 1000.);
         return lexicon;
+    }
+
+    public static LexiconSimple createLexicon(String name) {
+        return createLexicon(name, 0);
+    }
+
+    public static LexiconSimple createLexicon(String name, int type) {
+        return type == 2 ? new LexiconSimple2(name) : new LexiconSimple1(name, type == Lexicon.TYPE_FUZZY);
     }
 
     public static LexiconSimple compileLexicon(String name, String desc) {
