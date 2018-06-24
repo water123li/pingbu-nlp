@@ -185,12 +185,12 @@ public final class Parser {
     }
 
     private final class LexiconNavigator implements Subtree.Cursor.Navigator {
-        private final LexiconSimple mLexicon;
+        private final ListLexicon mLexicon;
         private final ArrayList<Unit> mPath = new ArrayList<>();
         private final ArrayList<Grammar.ItemSlot> mSlots = new ArrayList<>();
         private final ArrayList<Grammar.ItemParam> mParams = new ArrayList<>();
 
-        LexiconNavigator(LexiconSimple lexicon) {
+        LexiconNavigator(ListLexicon lexicon) {
             mLexicon = lexicon;
         }
 
@@ -249,33 +249,33 @@ public final class Parser {
         }
     }
 
-    public final LexiconSimple compileLexicon(String name, int type) {
+    public final ListLexicon compileLexicon(String name, int type) {
         return __compileLexicon(name, type, mCommands);
     }
 
-    private LexiconSimple __compileLexicon(String name, int type, Subtree grammar) {
+    private ListLexicon __compileLexicon(String name, int type, Subtree grammar) {
         log("==> compileLexicon %s", name);
         long t = System.currentTimeMillis();
-        LexiconSimple lexicon = createLexicon(name, type);
+        ListLexicon lexicon = createLexicon(name, type);
         grammar.newCursor(null).navigate(new LexiconNavigator(lexicon));
         t = System.currentTimeMillis() - t;
         log("<== compileLexicon %.3fs", t / 1000.);
         return lexicon;
     }
 
-    public static LexiconSimple createLexicon(String name) {
+    public static ListLexicon createLexicon(String name) {
         return createLexicon(name, 0);
     }
 
-    public static LexiconSimple createLexicon(String name, int type) {
+    public static ListLexicon createLexicon(String name, int type) {
         return type == 2 ? new LexiconSimple2(name) : new LexiconSimple1(name, type == Lexicon.TYPE_FUZZY);
     }
 
-    public static LexiconSimple compileLexicon(String name, String desc) {
+    public static ListLexicon compileLexicon(String name, String desc) {
         return compileLexicon(name, desc, 0);
     }
 
-    public static LexiconSimple compileLexicon(String name, String desc, int type) {
+    public static ListLexicon compileLexicon(String name, String desc, int type) {
         Parser parser = new Parser();
         parser.addCommand(desc, null);
         return parser.compileLexicon(name, type);

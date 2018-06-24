@@ -11,7 +11,7 @@ import java.util.Map;
 import pingbu.logger.Logger;
 import pingbu.pinyin.Pinyin;
 
-class LexiconSimple1 extends LexiconSimple {
+class LexiconSimple1 extends ListLexicon {
     private static final String TAG = LexiconSimple1.class.getSimpleName();
 
     private static final boolean LOG = false;

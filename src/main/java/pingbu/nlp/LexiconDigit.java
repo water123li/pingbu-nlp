@@ -72,9 +72,9 @@ class LexiconDigit extends Lexicon {
         return t;
     }
 
-    private static LexiconSimple __newLexicon(String name, int min, int max,
-            int flags) {
-        final LexiconSimple lexicon = new LexiconSimple1(String.format(name,
+    private static ListLexicon __newLexicon(String name, int min, int max,
+                                            int flags) {
+        final ListLexicon lexicon = new LexiconSimple1(String.format(name,
                 min, max), false);
         if ((flags & FLAG_ASC) != 0) {
             for (int i = min; i <= max; ++i)
